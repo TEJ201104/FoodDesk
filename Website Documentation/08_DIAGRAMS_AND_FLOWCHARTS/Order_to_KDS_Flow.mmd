@@ -1,0 +1,50 @@
+sequenceDiagram
+    autonumber
+    actor Cashier as Front Counter Cashier (POS)
+    actor Cook as Kitchen Line Cook (KDS)
+    actor Customer as Walk-In Customer
+    participant POS as POS Component (/pos)
+    participant Svc as stallDataService
+    participant Store as Browser localStorage
+    participant KDS as KitchenDisplayPage (/kds)
+    participant Track as OrderTrackingPage (/track)
+
+    Cashier->>POS: Adds dishes, custom notes & confirms order
+    POS->>Svc: createOrder(stallId, orderPayload)
+    Svc->>Svc: Allocate Token #104 & Order ORD-20261116-0004
+    Svc->>Store: Write order to "fooddesk_orders"
+    Svc-->>POS: Return Created Order Object
+    Svc->>KDS: Dispatch CustomEvent("fooddesk:order-created")
+    Svc->>Track: Dispatch Window "storage" Event
+
+    par Dual-Screen Notification
+        POS->>Cashier: Display Success Modal with giant Token #104
+        KDS->>Cook: Play Kitchen Bell Sound & Display Card #104 in "Received"
+        Track->>Customer: Display Milestone Step 1: "Order Received"
+    end
+
+    Note over Cook,KDS: Kitchen Cooking Stage
+    Cook->>KDS: Touch "Start Preparing" on Card #104
+    KDS->>Svc: updateOrderStatus(stallId, orderId, 'preparing')
+    Svc->>Store: Update orderStatus to 'preparing'
+    Svc->>Track: Dispatch CustomEvent("fooddesk:order-status-updated")
+    KDS->>Cook: Slide Card #104 into Column 2 ("Preparing")
+    Track->>Customer: Update Milestone Step 2: "Preparing (Chef is cooking)"
+
+    Note over Cook,KDS: Food Plating & Boxing Stage
+    Cook->>KDS: Touch "Mark as Ready" on Card #104
+    KDS->>Svc: updateOrderStatus(stallId, orderId, 'ready')
+    Svc->>Store: Update orderStatus to 'ready'
+    Svc->>Track: Dispatch CustomEvent("fooddesk:order-status-updated")
+    KDS->>Cook: Play Completion Chime & Slide Card to Column 3 ("Ready for Pickup")
+    Track->>Customer: Pulse Emerald Banner: "YOUR ORDER IS READY! Approach Counter."
+
+    Note over Customer,Cashier: Counter Handover Stage
+    Customer->>Cashier: Approaches counter showing Token #104 slip
+    Cashier->>Customer: Hands over hot food tray
+    Cashier->>KDS: Touch "Complete & Serve" on Card #104
+    KDS->>Svc: updateOrderStatus(stallId, orderId, 'completed')
+    Svc->>Store: Update orderStatus to 'completed'
+    KDS->>Cook: Slide Card #104 into Column 4 ("Completed")
+    Track->>Customer: Update Milestone Step 4: "Completed & Served"
+

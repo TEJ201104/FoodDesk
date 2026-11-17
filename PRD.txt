@@ -1,0 +1,725 @@
+## Project Name
+FoodDesk — Manage Smart. Serve Fast.
+
+## Project Overview
+
+Build a complete, production-quality, responsive web application using the MERN stack that digitizes the ordering, billing, payment tracking, and financial management operations of small food stalls and shops.
+
+The primary objective is to eliminate traditional notebook-based order management and manual accounting.
+
+The application should allow stall owners to create customer orders, manage food items, collect and verify payments, generate digital receipts, and automatically maintain financial records.
+
+This is not merely a food delivery application. It is a Multi-stall Point of Sale (POS), order management, payment tracking, and business analytics platform designed to simplify daily operations for individual food stall owners.
+
+## 1. Technology Stack
+
+Use the following technologies:
+
+Frontend:
+- React.js with Vite
+- Tailwind CSS
+- React Router
+- Axios
+- React Context API or Redux Toolkit
+- Recharts for analytics
+- Lucide React for icons
+
+Backend:
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT authentication
+- bcrypt for password hashing
+- Socket.IO for real-time communication
+
+Additional integrations:
+- Razorpay or another suitable UPI payment provider
+- MSG91 or another SMS gateway
+- WhatsApp Business API (optional)
+- Cloudinary for image storage
+- PDFKit or jsPDF for receipts
+
+Use a clean modular architecture with separate frontend and backend directories.
+
+## 2. User Roles
+
+Implement three roles:
+
+A. Super Admin:
+- Manage stall owners.
+- Review, approve, reject, suspend, and manage stall profiles.
+- Manage application settings.
+- View overall platform statistics.
+- Monitor platform health and system-level errors.
+- Receive and manage support requests submitted by stall owners.
+- View reported issues and their status.
+- Respond to support requests and communicate resolutions.
+
+B. Stall Owner:
+- Manage food items and categories.
+- Create and manage customer orders.
+- Verify payment status.
+- Generate digital receipts and send notifications.
+- Track sales and expenses.
+- View profit and loss reports.
+- Manage inventory.
+
+C. Customer:
+- Visit the stall and place orders directly with the stall owner or staff.
+- Make payments using the payment methods provided by the stall.
+- Receive digital receipts and notifications.
+- Track order status using an order number or secure tracking link.
+- View the stall's public profile and digital menu, where available.
+
+Implement strict role-based access control and stall-level data isolation.
+
+## 3. Authentication and Stall Onboarding
+
+### A. Authentication and Account Management
+
+Create:
+- Login page.
+- Stall owner registration page.
+- Admin authentication.
+- Email/mobile verification during registration.
+- JWT-based authentication.
+- Password hashing using bcrypt.
+- Protected routes.
+- Role-based route authorization.
+- Forgot password functionality.
+- Profile management.
+- Secure logout and session management.
+
+New stall owners should require admin approval before accessing the POS and other stall management features.
+
+Stall owners should only be able to access and manage data belonging to their authorized stall profiles.
+
+Account verification and stall approval must be treated as separate processes. A verified account does not automatically grant access to stall management features.
+
+### B. Stall Onboarding and Profile Creation
+
+After registering and verifying their account, stall owners should be guided through a stall profile creation process.
+
+**Stall Profile Fields:**
+- Stall Name.
+- Owner Name.
+- Stall Logo / Profile Image.
+- Cover Image (optional).
+- Business Category.
+- Stall Description.
+- Contact Number.
+- Business Address / Location.
+- Operating Hours.
+- UPI Payment Details.
+- Stall Status (Pending Approval / Active / Inactive / Suspended).
+
+**Each stall should have:**
+- A unique Stall ID.
+- A unique public profile URL.
+- A dedicated digital menu.
+
+New stall profiles should remain in Pending Approval status until reviewed and approved by the Super Admin.
+
+A verified stall owner can log in and manage their account, but access to POS, orders, payments, and other stall management features should only be granted for approved and active stall profiles.
+
+If an existing stall owner registers another stall, the new stall profile must undergo a separate approval process without affecting their already approved stalls.
+
+Stall owners should be able to edit their stall profiles and manage individual stall settings through the dashboard.
+
+Each stall must maintain its own menu, orders, payments, expenses, inventory, and analytics. Stall data must remain isolated from other owners' businesses.
+
+## 4. Stall Owner Dashboard
+
+Build a professional dashboard with the following statistics:
+
+- Today's total sales.
+- Today's total orders.
+- Total successful payments.
+- Pending payments.
+- Pending orders.
+- Cancelled orders.
+- Estimated gross profit.
+- Estimated net profit.
+
+Include:
+- Recent orders table.
+- Sales trend graph.
+- Popular food items.
+- Payment distribution chart.
+- Quick actions.
+- Low-stock notifications.
+
+Provide filters for today, yesterday, this week, this month, this year, and custom date ranges.
+
+## 5. Food Menu Management
+
+Allow stall owners to:
+
+- Add food items.
+- Upload food images.
+- Edit food items.
+- Delete or archive food items.
+- Set item prices.
+- Create categories.
+- Mark items available/unavailable.
+
+Every menu item must belong to a specific stall.
+
+Fields:
+- Name.
+- Description.
+- Image.
+- Category.
+- Selling price.
+- Cost price.
+- Availability.
+- Stall ID.
+
+### Historical Order Record Protection
+
+- Deleting or archiving a menu item must not delete, modify, or affect historical order records.
+- Changes to menu prices or item details must only affect future orders, not existing or historical orders.
+- Preserve historical food item details, including item name, selling price, cost price, and quantity, within the associated order records.
+- Prefer soft deletion or archival for menu items referenced by historical orders.
+
+## 6. POS and Order Creation
+
+This is the most important feature.
+
+Build a fast and intuitive Point of Sale interface.
+
+### Order Placement Model
+
+FoodDesk must follow an owner-assisted, walk-in ordering model.
+
+- Customers must physically visit the stall and communicate their orders directly to the stall owner or staff.
+- The stall owner or authorized staff member must enter all customer orders through the FoodDesk POS interface.
+- Customers must not be able to create, submit, or place orders independently through their mobile phones or other devices.
+- Do not implement customer-side shopping carts, online checkout, or self-service order placement.
+- Customers may use their devices to complete payments, receive digital receipts, or check order status.
+
+The interface should contain:
+
+LEFT SECTION:
+- Food item grid.
+- Food images.
+- Item names.
+- Prices.
+- Category filters.
+- Search bar.
+- Availability indicators.
+
+RIGHT SECTION:
+- Current order/cart.
+- Selected items.
+- Quantity controls.
+- Remove item.
+- Customer mobile number.
+- Subtotal.
+- Discounts, if applicable.
+- Grand total.
+- Payment button.
+
+Order workflow:
+
+1. Customer visits the stall.
+2. Customer communicates their food selection to the stall owner or staff.
+3. Stall owner or staff opens New Order in the POS.
+4. Selects the requested food items.
+5. Adjusts quantities.
+6. Enters the customer's mobile number (optional).
+7. System calculates the bill.
+8. System creates an order with a unique order number.
+9. Order enters Awaiting Payment status.
+10. Customer completes payment.
+11. Payment is verified.
+12. Order becomes Confirmed.
+13. Digital receipt is generated.
+14. Customer receives the receipt.
+
+### Daily Order Number Generation
+
+Use unique order IDs such as:
+ORD-YYYYMMDD-0001
+
+Ensure order IDs are generated safely without race conditions.
+
+Prevent duplicate order creation through idempotency mechanisms.
+
+Reset the order sequence to 0001 at the start of each business day.
+
+Order numbering must reset daily for each individual stall.
+
+Use an atomic counter to prevent duplicate order numbers when multiple orders are created simultaneously.
+
+The unique order number should be combined with the stall identifier internally to ensure uniqueness across the platform and enforce database-level uniqueness using the Stall ID and order number.
+
+Store item names, selling prices, cost prices, and quantities as historical snapshots inside each order.
+
+## 7. Payment Integration
+
+Implement UPI payments.
+
+Support integration with an appropriate payment gateway such as Razorpay or another provider that supports UPI payments.
+
+The payment gateway should support applicable payment methods such as:
+- UPI QR payments.
+- UPI payments through applications such as Google Pay, PhonePe, and Paytm.
+- NetBanking, where supported.
+- Other payment methods supported by the selected provider.
+
+Required functionality:
+- Generate an order-specific payment request.
+- Display the exact payable amount.
+- Generate a payment QR code where supported.
+- Allow customer to scan and pay using UPI applications.
+- Verify payments on the backend.
+- Use authenticated gateway webhooks.
+- Validate transaction amounts and order references.
+- Prevent duplicate payment processing.
+- Store gateway transaction IDs.
+- Maintain payment history.
+
+IMPORTANT:
+Never mark an order as paid based solely on a frontend callback, customer confirmation, or uploaded screenshot.
+
+Only mark payments successful after trusted server-side verification.
+
+For local development, implement a clearly labeled mock payment mode.
+
+For the prototype, also provide a manual payment verification mode for static UPI QR payments. Store the transaction reference and verification details. Do not represent manual verification as automated gateway verification.
+
+Support the following payment statuses:
+- Pending.
+- Processing.
+- Successful.
+- Failed.
+- Refunded.
+
+Support cash payments as an additional payment method.
+
+### Manual and Cash Payment Verification
+
+- For static UPI QR payments, the stall owner must manually verify the transaction against their actual payment account or transaction history.
+- Store the UPI transaction reference, verification timestamp, and the stall owner's ID who verified the payment.
+- Cash payments should be marked as successful only after the stall owner confirms receipt of the cash.
+- Record who confirmed each manual or cash payment.
+- Maintain an audit trail for all manual payment status changes.
+
+### Payment Failure and Timeout Handling
+
+- If payment fails, the order should remain in Awaiting Payment status.
+- If payment remains pending beyond a configurable time limit, mark it as Payment Expired or require payment status re-verification.
+- Allow the stall owner to retry payment or cancel eligible unpaid orders.
+- Prevent duplicate successful payments from creating duplicate revenue entries.
+- If payment succeeds after an order has been cancelled or expired, flag it for manual resolution or refund.
+
+### Stall-wise Payment Configuration
+
+- Each stall must have its own payment configuration.
+- Store the stall owner's UPI ID and relevant payment details securely.
+- Where supported, generate order-specific dynamic payment QR codes containing the exact payable amount.
+- Ensure that payments are credited to the correct stall owner's payment account.
+- Do not mix payment records or settlements between different stalls.
+- If the platform uses a shared payment gateway, implement an appropriate merchant onboarding or marketplace settlement mechanism.
+- For the prototype, allow stall owners to configure their own static UPI QR code.
+
+## 8. Digital Receipt Generation
+
+Generate a professional digital receipt after payment is confirmed, whether through verified gateway payment, manually verified UPI payment, or recorded cash payment.
+
+Receipt should contain:
+- Stall name.
+- Stall details.
+- Unique order number.
+- Date and time.
+- Customer mobile number (masked where appropriate).
+- Food item names.
+- Quantities.
+- Individual item prices.
+- Subtotal.
+- Discount.
+- Final amount.
+- Payment method.
+- Payment transaction reference.
+- Payment status.
+
+Allow:
+- Receipt preview.
+- PDF download.
+- Receipt sharing.
+- SMS delivery.
+- Optional WhatsApp delivery.
+
+Create a retry mechanism for failed notifications.
+
+The order must remain stored even if notification delivery fails.
+
+## 9. Order Management
+
+Create an order management page with:
+
+- All orders.
+- Order details.
+- Search by order number.
+- Search by mobile number.
+- Date filters.
+- Payment filters.
+- Status filters.
+- Order cancellation.
+- Refund tracking.
+
+### Order Statuses
+
+- Awaiting Payment.
+- Confirmed.
+- Preparing.
+- Ready.
+- Completed.
+- Cancelled.
+
+### Payment Statuses
+
+- Pending.
+- Processing.
+- Successful.
+- Failed.
+- Partially Refunded.
+- Refunded.
+
+Maintain order status and payment status independently.
+
+A successful payment should update the payment status and move the order to Confirmed.
+
+Refunding a payment should not automatically overwrite the order's preparation or completion status.
+
+If an order is cancelled after payment, maintain the cancellation and refund records separately.
+
+Allow stall owners to update preparation and pickup statuses.
+
+Implement real-time updates using Socket.IO.
+
+## 10. Expense Management
+
+Create an expense management module.
+
+Allow owners to record:
+- Raw material expenses.
+- Gas.
+- Electricity.
+- Salaries.
+- Packaging.
+- Transportation.
+- Other expenses.
+
+Expense fields:
+- Expense category.
+- Description.
+- Amount.
+- Date.
+- Optional attachment.
+- Stall ID.
+
+Allow owners to edit and view historical expenses while preserving an audit trail.
+
+## 11. Financial Analytics
+
+Create an analytics dashboard.
+
+### Financial Calculation Rules
+
+Gross Sales = Total value of eligible sales before discounts and refunds.
+
+Net Revenue = Gross Sales - Discounts - Refunds.
+
+Cost of Goods Sold (COGS) = Total cost price of items sold, calculated using historical cost price snapshots and eligible order quantities.
+
+Gross Profit = Net Revenue - COGS.
+
+Net Profit = Gross Profit - Other Recorded Business Expenses.
+
+Clearly distinguish:
+- Gross sales.
+- Discounts.
+- Refunds.
+- Net revenue.
+- Cost of goods sold.
+- Other expenses.
+- Gross profit.
+- Net profit.
+
+Do not count pending or failed payments as collected revenue.
+
+Do not count cancelled orders as sales.
+
+Use historical price and cost snapshots.
+
+Refunds must be deducted from revenue.
+
+Discounts must be reflected in actual collected revenue.
+
+Pending and failed payments must not count as collected sales.
+
+Historical cost prices must remain unchanged.
+
+Reports must be calculated independently for each stall.
+
+Cash payments confirmed by the stall owner should be included in collected revenue, while pending cash payments must not be counted as collected sales.
+
+Maintain separate reporting for cash payments and digital payments to support payment reconciliation.
+
+Provide:
+- Daily sales reports.
+- Weekly sales reports.
+- Monthly sales reports.
+- Yearly sales reports.
+- Custom date reports.
+- Total orders.
+- Average order value.
+- Best-selling items.
+- Least-selling items.
+- Revenue charts.
+- Expense charts.
+- Profit/loss charts.
+
+Allow CSV and PDF exports.
+
+Use MongoDB aggregation pipelines for report calculations.
+
+## 12. Inventory Management
+
+Implement a basic inventory management module.
+
+Allow owners to:
+- Add ingredients.
+- Define stock quantities.
+- Update stock.
+- Set minimum stock levels.
+- Record wastage.
+- Receive low-stock notifications.
+
+Keep inventory optional for the initial MVP.
+
+## 13. Digital Token and Kitchen Management
+
+Generate a unique pickup token for every order.
+
+Create a kitchen/order display interface showing:
+- New orders.
+- Preparing orders.
+- Ready orders.
+- Completed orders.
+
+Use large and easily readable order numbers.
+
+Allow customers to check their pickup status.
+
+## 14. Database Collections
+
+Design MongoDB schemas for:
+
+- Users.
+- Stalls.
+- Categories.
+- MenuItems.
+- Orders.
+- Payments.
+- Expenses.
+- InventoryItems.
+- Notifications.
+- SupportTickets.
+- AuditLogs.
+
+Use Mongoose schemas with validation, indexes, timestamps, and appropriate references.
+
+Every stall-related document must contain a stallId.
+
+Each Stall document must contain an ownerId linking it to the registered stall owner's User ID.
+
+A single owner account should be able to own and manage multiple stall profiles.
+
+All stall-related collections must maintain the correct stallId reference, and ownership must be validated through the authenticated user's authorized stall profiles.
+
+Enforce tenant isolation in all backend queries and mutations.
+
+Store monetary values as integer paise.
+
+Use Asia/Kolkata for business reporting and date boundaries.
+
+## 15. UI/UX Design
+
+The interface must look like a modern SaaS POS platform.
+
+Design preferences:
+- Clean and minimal layout.
+- Professional dashboard.
+- Deep navy/charcoal primary colors.
+- Orange accent color.
+- White/light-grey backgrounds.
+- Green success indicators.
+- Red error indicators.
+- Rounded cards.
+- Subtle shadows.
+- Consistent typography.
+- Responsive layouts.
+
+The POS interface must prioritize speed and ease of use.
+
+Support:
+- Desktop.
+- Laptop.
+- Tablet.
+- Mobile.
+
+Create loading states, skeleton loaders, empty states, confirmation dialogs, and meaningful error messages.
+
+Do not use generic default templates or cluttered layouts.
+
+Make the application visually consistent across all pages.
+
+## 16. Security and Reliability
+
+### Authentication and Authorization
+- JWT authentication.
+- bcrypt password hashing.
+- Protected API endpoints.
+- Role-based access control.
+- Secure logout and session management.
+- Input validation.
+
+### Multi-Tenant Data Security
+- Enforce strict stall-level tenant isolation.
+- A stall owner must only be able to access data belonging to their authorized stall profiles.
+- Enforce server-side ownership verification for every stall-related API request.
+- Prevent unauthorized access to another stall's orders, payments, expenses, inventory, and analytics.
+- Never trust client-submitted stall IDs or ownership information.
+
+### Payment Security
+- Payment webhook signature verification.
+- Idempotent payment processing.
+- Secure payment transaction records.
+- Never trust client-submitted prices or payment statuses.
+
+### Application Security
+- Rate limiting.
+- CORS configuration.
+- Secure environment variables.
+- Secure API endpoints.
+- Audit logs.
+- Database indexes.
+- Error handling.
+- Backup recommendations.
+
+### Data and Secret Protection
+- Never expose API keys, secrets, or payment credentials in frontend code.
+- Protect customer information and sensitive business data.
+- Maintain historical order and transaction records even when menu items are deleted or archived.
+
+- A stall owner must only be able to access data belonging to their authorized stall profiles.
+- Enforce server-side ownership verification for every stall-related API request.
+- Prevent unauthorized access to another stall's orders, payments, expenses, inventory, and analytics.
+
+## 17. Development Instructions
+
+Follow these instructions carefully:
+
+1. First create the complete project structure.
+2. Set up the React frontend.
+3. Set up the Express backend.
+4. Configure MongoDB connection.
+5. Design and implement database schemas.
+6. Implement authentication and authorization.
+7. Build the dashboard and POS.
+8. Implement order management.
+9. Implement payment integration.
+10. Implement receipt generation.
+11. Implement financial analytics.
+12. Implement notifications.
+13. Implement optional advanced modules.
+14. Test the complete application.
+15. Fix errors and verify all user flows.
+
+Use reusable components and modular code.
+
+Keep frontend and backend logic separate.
+
+Create reusable API services and middleware.
+
+Do not put all logic inside App.jsx or a single Express file.
+
+Use environment variables and provide a .env.example file.
+
+Provide meaningful comments for complex operations.
+
+Do not use hardcoded financial statistics or fake payment confirmations.
+
+If external credentials are unavailable, implement the integration structure and clearly document the required configuration. Use mock mode only for local development.
+
+## 18. Expected Deliverables
+
+Provide:
+
+- Complete MERN source code.
+- Frontend and backend directories.
+- MongoDB database schemas.
+- REST API implementation.
+- Authentication system.
+- Responsive user interface.
+- POS system.
+- Order management.
+- Payment integration structure.
+- Receipt generation.
+- SMS notification integration structure.
+- Financial analytics.
+- Expense management.
+- Sample seed data for development.
+- .env.example file.
+- README.md with setup instructions.
+- API documentation.
+- Deployment instructions.
+
+## 19. Final Acceptance Criteria
+
+The application will be considered functional when:
+
+1. A stall owner can register and log in.
+2. A stall owner can add, edit, and manage menu items.
+3. A stall owner can create an order by selecting food items.
+4. The system automatically calculates the bill.
+5. A unique order number is generated.
+6. A customer can make a payment using the configured payment method.
+7. The backend verifies the payment.
+8. The order is updated with the correct payment status.
+9. A digital receipt is generated.
+10. The receipt can be downloaded.
+11. The receipt can be sent to the customer's mobile number when messaging credentials are configured.
+12. The owner can view previous orders.
+13. The owner can record business expenses.
+14. The dashboard displays accurate sales information.
+15. The system calculates gross and net profit based on available cost and expense data.
+16. Daily, weekly, monthly, and yearly reports work correctly.
+17. Different stall owners cannot access each other's data.
+18. The application works on desktop and mobile devices.
+19. A stall owner can create and manage multiple authorized stall profiles under one account.
+20. Newly created stall profiles remain pending until Super Admin approval.
+21. Unapproved or inactive stalls cannot access POS and stall management features.
+22. Each stall has its own menu, orders, payments, expenses, and financial reports.
+23. Historical orders and receipts remain accessible even after menu items are archived or deleted.
+24. Daily order numbering resets independently for each stall without generating duplicate order numbers.
+25. Stall owners cannot access another owner's business data.
+26. Customers cannot independently place or submit orders through their devices. All orders must be created by the stall owner or authorized staff through the POS interface.
+
+## Final Instruction
+
+Build this as a complete, functional, polished MERN-stack SaaS application, not just a UI prototype.
+
+Prioritize the core ordering, payment verification, billing, and financial management workflow.
+
+Complete and test one module before moving to the next.
+
+Do not skip backend functionality, database persistence, API integration, or validation.
+
+Make sensible engineering decisions where implementation details are unspecified.
+
+The final result should be suitable for real-world deployment by small food stall owners, with a clear path to scaling across multiple independent food vendors and businesses.

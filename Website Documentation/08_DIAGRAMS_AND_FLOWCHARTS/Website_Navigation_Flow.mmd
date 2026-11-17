@@ -1,0 +1,72 @@
+flowchart TD
+    %% FoodDesk Complete Website Navigation Flowchart
+    
+    Root["Root Entry Point (/)"] --> CheckAuth{Is User Authenticated?}
+    
+    CheckAuth -- No --> LoginPage["Login Page (/login)"]
+    CheckAuth -- Yes --> CheckRole{Check User Role}
+    
+    %% Public Routes
+    LoginPage --> PublicMenu["Public Digital Menu (/menu/:stallSlug)"]
+    LoginPage --> PublicTrack["Public Order Tracking (/track/:stallSlug/:orderNumber)"]
+    
+    %% Dual-Mode Login
+    LoginPage --> SelectMode{Select Login Tab}
+    SelectMode -- Stall Owner --> OwnerAuth["Verify 3 Credentials: Email + Password + Stall ID"]
+    SelectMode -- Super Admin --> AdminAuth["Verify 2 Credentials: Email + Password"]
+    
+    OwnerAuth -- Success --> StallDashboard["Stall Dashboard (/dashboard)"]
+    AdminAuth -- Success --> AdminDashboard["Platform Dashboard (/admin/dashboard)"]
+    
+    %% Role Redirection
+    CheckRole -- Stall Owner --> StallDashboard
+    CheckRole -- Super Admin --> AdminDashboard
+    
+    %% Stall Owner Navigation (10 Modules)
+    subgraph StallOwnerPortal["Stall Owner Operational Shell (AppLayout)"]
+        StallDashboard
+        StallPOS["POS / New Order (/pos)"]
+        StallOrders["Order Management Hub (/orders)"]
+        StallKDS["Kitchen Display System (/kds)"]
+        StallMenu["Menu Catalog & Pricing (/menu)"]
+        StallExpenses["Expense Management (/expenses)"]
+        StallAnalytics["Financial Analytics & P&L (/analytics)"]
+        StallInventory["Inventory & Ingredients (/inventory)"]
+        StallSupport["Support & Issue Management (/support)"]
+        StallSettings["Stall Profile & Settings (/settings)"]
+        
+        StallDashboard --> StallPOS
+        StallDashboard --> StallOrders
+        StallDashboard --> StallKDS
+        StallDashboard --> StallMenu
+        StallDashboard --> StallExpenses
+        StallDashboard --> StallAnalytics
+        StallDashboard --> StallInventory
+        StallDashboard --> StallSupport
+        StallDashboard --> StallSettings
+    end
+    
+    %% Super Admin Navigation (5 Modules)
+    subgraph SuperAdminPortal["Super Admin Governance Shell (AppLayout)"]
+        AdminDashboard
+        AdminStalls["Stall Approvals & Directory (/admin/stalls)"]
+        AdminOwners["Owner Management Registry (/admin/owners)"]
+        AdminTickets["Central Issue Desk (/admin/tickets)"]
+        AdminSettings["Platform Diagnostics & Reset (/admin/settings)"]
+        
+        AdminDashboard --> AdminStalls
+        AdminDashboard --> AdminOwners
+        AdminDashboard --> AdminTickets
+        AdminDashboard --> AdminSettings
+    end
+    
+    %% Route Guards & Security Barriers
+    StallOwnerPortal -. RoleGuard: Redirects Stall Owner to /dashboard .-> SuperAdminPortal
+    SuperAdminPortal -. RoleGuard: Redirects Admin to /admin/dashboard .-> StallOwnerPortal
+    
+    %% Logout Flow
+    StallOwnerPortal --> LogoutAction["Logout Button"]
+    SuperAdminPortal --> LogoutAction
+    LogoutAction --> PurgeSession["Purge Session Token from localStorage"]
+    PurgeSession --> LoginPage
+

@@ -1,0 +1,153 @@
+================================================================================
+FOODDESK — USER ROLES, ACCESS CONTROL & PERMISSIONS GUIDE
+================================================================================
+Document File: 02_ROLES_AND_ACCESS_GUIDE.txt
+Location:      D:\Projects\FoodDesk\Website Documentation\
+Version:       1.0.0 (Release Candidate Demonstration Build)
+Applicability: FoodDesk Multi-Tenant POS & Stall Operations Platform
+Audit State:   100% Codebase-Verified • Non-Destructive Audit Mode
+================================================================================
+
+1. OVERVIEW OF ROLES & IDENTITIES
+--------------------------------------------------------------------------------
+FoodDesk enforces a strict, hierarchical, role-based access control (RBAC) architecture combined with a multi-tenant workspace isolation model.
+
+The platform distinguishes between four distinct user identities:
+
+1. SUPER ADMINISTRATOR (Platform Governance):
+   A global administrative user responsible for platform-wide oversight, stall approvals, owner compliance, dispute resolution, and environment maintenance. The Super Admin does not operate front-of-house POS cash registers or kitchen display stations; rather, they govern the overall network of food stalls.
+
+2. MULTI-STALL OWNER (Owner 1):
+   An entrepreneur who owns and operates multiple physical counters within the same food court or market (specifically Fast Food Stall stall-1 and Beverages Stall stall-2). This user has permission to switch seamlessly between their authorized stall workspaces via a dynamic top-bar switcher.
+
+3. SINGLE-STALL OWNER (Owner 2):
+   A specialized stall operator who owns and operates exactly one counter (specifically Desserts & Sweets Stall stall-3). This user is strictly locked to their single authorized workspace and cannot access or view any other stall's operations or financials.
+
+4. PUBLIC WALK-IN CUSTOMER (Unauthenticated):
+   A guest customer visiting the food court who interacts with the system using their personal mobile phone or counter-side tablet. Public customers require zero login credentials and have access exclusively to public digital menus and live order tracking web pages.
+
+
+2. USER CREDENTIALS & DEMO PROFILES
+--------------------------------------------------------------------------------
+The application comes pre-configured with the following verified credentials:
+
++---------------------+-------------------+------------+-------------------+----------------------------+
+| Role / Account      | Email Address     | Password   | Authorized Stalls | Authentication Mechanism   |
++---------------------+-------------------+------------+-------------------+----------------------------+
+| Super Administrator | admin@gmail.com   | admin      | All (Platform)    | 2 Credentials:             |
+|                     |                   |            |                   | Email + Password           |
++---------------------+-------------------+------------+-------------------+----------------------------+
+| Stall Owner 1       | owner1@gmail.com  | owner1     | stall-1 (Fast Food)| 3 Credentials:             |
+| (Multi-Stall)       |                   |            | stall-2 (Beverages)| Email + Password + Stall ID|
++---------------------+-------------------+------------+-------------------+----------------------------+
+| Stall Owner 2       | owner2@gmail.com  | owner2     | stall-3 (Desserts) | 3 Credentials:             |
+| (Single-Stall)      |                   |            | (Strictly locked) | Email + Password + Stall ID|
++---------------------+-------------------+------------+-------------------+----------------------------+
+| Public Customer     | None (Guest)      | None       | Bound by URL slug | Zero Credentials           |
+|                     |                   |            | (e.g. /menu/slug) | (Public read-only)         |
++---------------------+-------------------+------------+-------------------+----------------------------+
+
+
+3. THE 3-CREDENTIAL STALL OWNER VERIFICATION GATE
+--------------------------------------------------------------------------------
+Unlike conventional single-tenant applications that only require an email address and password, FoodDesk requires Stall Owners to provide three credentials upon login:
+
+1. Registered Email Address (e.g., owner1@gmail.com)
+2. Account Password (e.g., owner1)
+3. Authorized Stall ID (e.g., stall-1 or stall-2)
+
+WHY THREE CREDENTIALS?
+The 3-credential verification gate guarantees that an authenticated stall owner explicitly selects their active physical workstation at the moment of entry. It prevents counter staff from inadvertently operating under the wrong stall profile, ensuring that orders, menu modifications, expenses, and inventory adjustments are immediately and unequivocally bound to the correct tenant repository.
+
+If an owner attempts to log in with valid email and password credentials but provides a Stall ID that is not authorized for their account (for example, Owner 2 attempting to enter stall-1), the authentication service (mockAuthService.js) immediately rejects the request with an explicit error:
+"Stall ID 'stall-1' is not authorized for this account."
+
+
+4. COMPLETE PERMISSIONS & ROUTE ACCESS MATRIX
+--------------------------------------------------------------------------------
+FoodDesk defines exactly eighteen routes across public, stall owner, and super admin tiers. Access is enforced by three cascading React Router wrappers:
+- AuthGuard: Blocks unauthenticated users and redirects them to /login.
+- RoleGuard: Enforces strict separation between stall owners and super admin.
+- StallGuard: Enforces tenant isolation and active stall authorization for stall owners.
+
++--------------------------+---------------------+--------------------+-------------------+-----------------+
+| Route Path               | Page Component      | Super Admin Access | Stall Owner Access| Public Customer |
++--------------------------+---------------------+--------------------+-------------------+-----------------+
+| /                        | Root Redirect       | Redirects to admin | Redirects to /dash| Redirects /login|
+| /login                   | LoginPage           | Accessible (Public)| Accessible (Public| Accessible      |
+| /menu/:stallSlug         | PublicMenuPage      | Accessible (Public)| Accessible (Public| Full Access     |
+| /track/:stallSlug        | OrderTrackingPage   | Accessible (Public)| Accessible (Public| Full Access     |
+| /track/:stallSlug/:order#| OrderTrackingPage   | Accessible (Public)| Accessible (Public| Full Access     |
++--------------------------+---------------------+--------------------+-------------------+-----------------+
+| /dashboard               | StallDashboardPage  | Blocked (Redirect) | Full Access       | Blocked (/login)|
+| /pos                     | POSPage             | Blocked (Redirect) | Full Access       | Blocked (/login)|
+| /orders                  | OrderManagementPage | Blocked (Notice)   | Full Access       | Blocked (/login)|
+| /kds                     | KitchenDisplayPage  | Blocked (Notice)   | Full Access       | Blocked (/login)|
+| /menu                    | MenuManagementPage  | Blocked (Redirect) | Full Access       | Blocked (/login)|
+| /expenses                | ExpenseManagementPage Blocked (Redirect)| Full Access       | Blocked (/login)|
+| /analytics               | FinancialAnalytics  | Blocked (Redirect) | Full Access       | Blocked (/login)|
+| /inventory               | InventoryPage       | Blocked (Redirect) | Full Access       | Blocked (/login)|
+| /support                 | SupportPage         | Blocked (Redirect) | Full Access       | Blocked (/login)|
+| /settings                | StallSettingsPage   | Blocked (Redirect) | Full Access       | Blocked (/login)|
++--------------------------+---------------------+--------------------+-------------------+-----------------+
+| /admin/dashboard         | AdminDashboardPage  | Full Access        | Blocked (Redirect)| Blocked (/login)|
+| /admin/stalls            | StallManagementPage | Full Access        | Blocked (Redirect)| Blocked (/login)|
+| /admin/owners            | OwnerManagementPage | Full Access        | Blocked (Redirect)| Blocked (/login)|
+| /admin/tickets           | AdminSupportPage    | Full Access        | Blocked (Redirect)| Blocked (/login)|
+| /admin/settings          | AdminSettingsPage   | Full Access        | Blocked (Redirect)| Blocked (/login)|
++--------------------------+---------------------+--------------------+-------------------+-----------------+
+
+
+5. ROUTE INTERCEPTION & REDIRECTION RULES
+--------------------------------------------------------------------------------
+The platform implements strict redirection handling to ensure that users can never get trapped in an invalid state:
+
+1. UNAUTHENTICATED USERS:
+   - Any attempt to access protected paths (/dashboard, /pos, /admin/dashboard, etc.) triggers AuthGuard.
+   - The user is redirected to /login with state.from preserved so that upon authenticating, they can be returned to their intended destination.
+
+2. AUTHENTICATED USERS VISITING /login:
+   - Protected by PublicAuthRoute.
+   - If an already authenticated Stall Owner attempts to visit /login, they are automatically forwarded to /dashboard.
+   - If an already authenticated Super Admin attempts to visit /login, they are automatically forwarded to /admin/dashboard.
+
+3. CROSS-ROLE INTERCEPTION (RoleGuard):
+   - If a Stall Owner attempts to manually navigate to any Super Admin URL (e.g., /admin/dashboard, /admin/stalls), RoleGuard intercepts the transition and redirects them safely back to /dashboard.
+   - If a Super Admin attempts to navigate to a stall-specific route (e.g., /dashboard, /pos, /menu), RoleGuard intercepts the transition and redirects them to /admin/dashboard.
+   - For operational screens like /orders and /kds, if a Super Admin navigates directly, an informative governance notice card is displayed explaining that order capture and cooking management are staff counter tools.
+
+
+6. MULTI-STALL AUTHORIZATION & STALLGUARD TAMPER RECOVERY
+--------------------------------------------------------------------------------
+In modern browser single-page applications, client-side session states stored in localStorage can potentially be manipulated using browser developer tools. FoodDesk incorporates a self-healing client-side resilience layer called StallGuard:
+
+HOW STALLGUARD WORKS:
+1. Whenever a Stall Owner navigates between routes, StallGuard inspects both the in-memory active stall object (currentStall) and the raw session object stored in localStorage (fooddesk_session).
+2. It verifies that the active stall ID is explicitly listed in the user's authorizedStalls array.
+3. If an anomaly is detected (e.g., if a user manually changes activeStall.id to 'stall-1' while logged in as Owner 2):
+   - StallGuard immediately triggers recoverAuthorizedStall().
+   - The active stall in both memory and storage is automatically repaired and reset to the primary authorized stall (e.g., stall-3).
+   - A warning toast notification is displayed: "Unauthorized stall configuration detected. Automatically recovered to authorized workspace."
+4. If an owner profile has zero authorized stalls, entry is completely denied and the session is redirected to /login.
+
+
+7. NAVIGATION BAR & WORKSPACE SWITCHING BEHAVIOUR
+--------------------------------------------------------------------------------
+The top navigation bar dynamically adapts to the authenticated role:
+
+FOR MULTI-STALL OWNERS (Owner 1):
+- Displays an interactive dropdown button showing the current stall name, ID, and a green online dot.
+- Clicking the button reveals the "Switch Active Stall" dropdown listing all authorized stalls (stall-1 Fast Food and stall-2 Beverages).
+- Selecting a stall instantly switches the workspace, triggers a cache invalidation key (stallChangeKey), resets the POS cart to prevent cross-stall leakage, and updates all dashboard metrics and menu items in real time.
+
+FOR SINGLE-STALL OWNERS (Owner 2):
+- Displays a static, locked indicator showing "Desserts & Sweets Stall (stall-3)" with an active status badge.
+- No dropdown arrow is displayed and no switching is permitted, reinforcing workspace isolation.
+
+FOR SUPER ADMIN:
+- Displays a prominent purple badge with a shield icon reading "Super Admin Platform Mode".
+- The active stall indicator is hidden since the Super Admin operates at the platform level.
+
+================================================================================
+END OF FILE: 02_ROLES_AND_ACCESS_GUIDE.txt
+================================================================================

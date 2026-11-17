@@ -1,0 +1,54 @@
+sequenceDiagram
+    autonumber
+    actor User as User / Operator
+    participant UI as LoginPage Component
+    participant AuthCtx as AuthContext Provider
+    participant Svc as mockAuthService
+    participant Store as Browser localStorage
+    participant Guard as StallGuard Interceptor
+    participant Target as Target Dashboard Page
+
+    User->>UI: Selects Login Mode ("Stall Owner" or "Super Admin")
+    
+    alt Stall Owner Mode (3 Credentials)
+        User->>UI: Enters Email, Password, and Stall ID
+        User->>UI: Clicks "Verify Credentials & Open POS"
+        UI->>AuthCtx: loginOwner({ email, password, stallId })
+        AuthCtx->>Svc: loginStallOwner({ email, password, stallId })
+        Svc->>Svc: Verify user exists & password matches
+        Svc->>Svc: Verify stallId is in user.authorizedStalls
+        Svc->>Svc: Verify stall is active in stall registry
+        
+        alt Verification Successful
+            Svc->>Store: Write "fooddesk_session" (user, activeStall, token)
+            Svc->>Store: Write "fooddesk_active_stall_id"
+            Svc-->>AuthCtx: Return Session Object
+            AuthCtx-->>UI: Set in-memory session state
+            UI->>Target: Navigate to /dashboard
+            Target->>Guard: Intercept Route
+            Guard->>Guard: Verify currentStall.id belongs to authorizedStalls
+            Guard-->>Target: Grant Access & Render Dashboard
+        else Verification Failed
+            Svc-->>UI: Throw Authentication Error
+            UI->>User: Display shake animation & rose error banner
+        end
+        
+    else Super Admin Mode (2 Credentials)
+        User->>UI: Enters Email and Password
+        User->>UI: Clicks "Sign In as Super Admin"
+        UI->>AuthCtx: loginAdmin({ email, password })
+        AuthCtx->>Svc: loginSuperAdmin({ email, password })
+        Svc->>Svc: Verify user.role === 'super_admin' & password matches
+        
+        alt Admin Verification Successful
+            Svc->>Store: Write "fooddesk_session" (admin user, token)
+            Svc-->>AuthCtx: Return Admin Session
+            AuthCtx-->>UI: Set in-memory admin state
+            UI->>Target: Navigate to /admin/dashboard
+            Target-->>User: Render Platform Governance Dashboard
+        else Admin Verification Failed
+            Svc-->>UI: Throw Authentication Error
+            UI->>User: Display error notification
+        end
+    end
+

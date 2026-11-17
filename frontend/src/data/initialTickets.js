@@ -1,0 +1,72 @@
+/**
+ * Centralized Demo Support & Issue Reports Seed Data
+ * 5 explicit lifecycle statuses: 'Submitted', 'Under Review', 'In Progress', 'Resolved', 'Reopened'
+ */
+
+export const initialTickets = [
+  {
+    id: 'tkt-001',
+    stallId: 'stall-1',
+    stallName: 'Fast Food Stall',
+    ownerId: 'owner_1',
+    ownerName: 'Rahul Sharma',
+    ownerEmail: 'owner1@gmail.com',
+    title: 'Thermal receipt alignment on 58mm printer',
+    category: 'Hardware / Printer',
+    priority: 'Medium',
+    status: 'Resolved', // 'Submitted' | 'Under Review' | 'In Progress' | 'Resolved' | 'Reopened'
+    description: 'The right-aligned item totals were wrapping slightly on our 58mm USB receipt printer.',
+    adminResponse: 'Updated thermal print CSS formatting for compact 58mm roll widths. Please test using the Print button.',
+    submittedAt: '2026-11-10T11:00:00.000Z',
+    resolvedAt: '2026-11-10T15:30:00.000Z',
+  },
+  {
+    id: 'tkt-002',
+    stallId: 'stall-1',
+    stallName: 'Fast Food Stall',
+    ownerId: 'owner_1',
+    ownerName: 'Rahul Sharma',
+    ownerEmail: 'owner1@gmail.com',
+    title: 'Peak hour counter sound alert volume',
+    category: 'POS Error',
+    priority: 'Low',
+    status: 'In Progress',
+    description: 'Would like a slightly louder chime when an order is paid during lunch rush.',
+    adminResponse: 'Synthesizer gain is being calibrated for Module 2. Investigating audio boost setting.',
+    submittedAt: '2026-11-12T09:15:00.000Z',
+    resolvedAt: null,
+  },
+  {
+    id: 'tkt-003',
+    stallId: 'stall-2',
+    stallName: 'Beverages Stall',
+    ownerId: 'owner_1',
+    ownerName: 'Rahul Sharma',
+    ownerEmail: 'owner1@gmail.com',
+    title: 'Request to add fresh mint category',
+    category: 'Website Bug',
+    priority: 'Low',
+    status: 'Submitted',
+    description: 'Need a subcategory for herbal refreshers in beverage management.',
+    adminResponse: null,
+    submittedAt: '2026-11-12T16:00:00.000Z',
+    resolvedAt: null,
+  },
+  {
+    id: 'tkt-004',
+    stallId: 'stall-3',
+    stallName: 'Desserts & Sweets Stall',
+    ownerId: 'owner_2',
+    ownerName: 'Priya Patel',
+    ownerEmail: 'owner2@gmail.com',
+    title: 'UPI soundbox webhook test query',
+    category: 'Billing / Payment Discrepancy',
+    priority: 'High',
+    status: 'Under Review',
+    description: 'Inquiring how static Paytm QR soundbox notifications sync with our manual UTR verification.',
+    adminResponse: 'Static QR operates with owner UTR manual verification in prototype mode. Investigating gateway webhooks.',
+    submittedAt: '2026-11-12T14:30:00.000Z',
+    resolvedAt: null,
+  },
+];
+

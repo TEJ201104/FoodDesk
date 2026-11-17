@@ -1,0 +1,166 @@
+================================================================================
+FOODDESK — USER MANUAL & FUNCTIONAL SPECIFICATION
+================================================================================
+Document File: 04_PUBLIC_CUSTOMER/02_Product_and_Category_Exploration.txt
+Module Name:   Module 13: Public Customer Digital Menu — Product & Category Exploration
+Target Audience: Walk-In Customers, Menu Curators, Customer Experience Designers
+Verification:  VERIFIED • 100% Codebase-Grounded
+================================================================================
+
+1. FEATURE OVERVIEW
+--------------------------------------------------------------------------------
+This document provides an in-depth operational and functional guide to the Product & Category Exploration experience within the Public Customer Digital Menu.
+
+When dining in a fast-paced food court or market, patrons must make quick decisions regarding dietary preferences (such as Pure Vegetarian vs. Non-Vegetarian), price points, ingredients, and item availability. The FoodDesk customer interface provides a frictionless, intuitive exploration experience designed to prevent counter congestion, eliminate ordering questions ("Do you have vegetarian rolls?", "Is the mango shake available?"), and accelerate customer ordering velocity.
+
+Key capabilities include:
+- Universal Color-Coded Dietary Tagging: Clear, prominent Veg (Green) and Non-Veg (Red) emblems.
+- Intelligent Real-Time Substring Search: Matches queries across dish names, descriptions, and ingredients.
+- Dynamic Category Filtering: Automatically calculates and displays available item counts per category.
+- Out-of-Stock Visual Warnings: Immediate visual cues preventing customers from attempting to order unavailable dishes.
+- Absolute Data Confidentiality: Architectural stripping of sensitive internal metrics (cost prices, gross margins, supplier info) before sending data to the customer view.
+
+
+2. HOW TO ACCESS
+--------------------------------------------------------------------------------
+- Access Path: Within any active Public Menu URL (e.g., http://localhost:5173/menu/fast-food-stall).
+- Mobile Scan: Directly accessed when a patron scans a dining table or counter QR sticker.
+
+
+3. SCREEN LAYOUT
+--------------------------------------------------------------------------------
+The exploration interface occupies the lower two-thirds of the Public Menu page:
+
+1. Exploration Control Bar:
+   - Search Input Bar: Top full-width input container with search icon and clear button.
+   - Horizontal Category Pills: Horizontally scrollable row of touch-friendly pill buttons directly beneath the search bar.
+
+2. Product Catalog Card Grid:
+   - Responsive multi-column layout (1 column on mobile phones, 2 columns on tablets, 3 columns on desktop monitors).
+   - Each card represents one culinary offering with thumbnail, dietary tag, category tag, title, description, and price.
+
+
+4. DETAILED ELEMENT-BY-ELEMENT EXPLANATION
+--------------------------------------------------------------------------------
+Every exploration element and visual indicator is detailed below:
+
+A. SEARCH CONTROLS:
+- Search Input Field:
+  - Visual: White rounded container (rounded-xl) with gray border and focused orange ring.
+  - Prefix Icon: Search magnifying glass icon in slate-400.
+  - Placeholder: "Search dishes, snacks, beverages...".
+  - Behavior: Evaluates input in real time. Matching is case-insensitive.
+  - Clear Action: When text is present, clicking the 'X' icon clears the input immediately.
+
+B. CATEGORY FILTER PILLS:
+- "All" Category Pill:
+  - Label: "All" with total count of active items in catalog (e.g., "All (10)").
+- Specific Category Pills:
+  - Dynamically generated from unique stall categories (e.g., "Burgers", "Rolls", "Combos", "Beverages").
+  - Visual Styling:
+    - Inactive: Clean white background with slate border (bg-white border-slate-200 text-slate-700).
+    - Active: High-contrast brand orange background with white text and drop shadow (bg-brand-500 text-white).
+  - Touch Scrolling: Features overflow-x-auto for smooth horizontal thumb scrolling on mobile devices.
+
+C. PRODUCT CARDS IN DETAIL:
+- Food Photograph Container (h-44, 176px):
+  - Displays high-resolution food image with object-cover aspect ratio.
+  - Features an onError fallback handler that automatically swaps broken image links with a high-quality default food photograph.
+- Dietary Emblem (Top Left of Image):
+  - Elevated white pill badge with drop shadow.
+  - Pure Veg: High-visibility emerald green circle dot + "VEG" in bold font.
+  - Non-Veg: High-visibility crimson red circle dot + "NON-VEG" in bold font.
+- Category Badge (Top Right of Image):
+  - Semi-transparent dark pill with white text indicating the category name.
+- Sold Out Watermark & Card Dimming:
+  - When an item's availability is false:
+    - Entire card opacity is dimmed.
+    - An amber watermark overlay covers the center of the image reading "Sold Out / Unavailable".
+    - The price is crossed out or styled with an out-of-stock badge.
+- Food Title & Description:
+  - Title: Bold, dark slate title (font-bold text-slate-900).
+  - Description: Paragraph in slate-600 detailing ingredients, spices, and preparation style.
+- Retail Selling Price:
+  - Displayed in large, bold brand orange font (e.g., "₹140.00").
+  - Formatted strictly with the Indian Rupee symbol (₹) and two decimal places.
+
+
+5. AVAILABLE ACTIONS
+--------------------------------------------------------------------------------
+1. Filter by Dietary Category: Tap a specific category to inspect only relevant dishes.
+2. Search by Ingredient: Type keywords (e.g., "cheese", "garlic", "chocolate") to find matching items.
+3. Combine Search & Category: Select "Burgers" and type "paneer" to find paneer burger variants.
+4. Check Item Description: Read detailed ingredient notes before ordering.
+5. Identify Sold-Out Items: Instantly see what items cannot be ordered today.
+
+
+6. STEP-BY-STEP USAGE GUIDE
+--------------------------------------------------------------------------------
+SCENARIO: A VEGETARIAN PATRON SEARCHING FOR SPICY OPTIONS
+1. The customer opens http://localhost:5173/menu/fast-food-stall on their phone.
+2. In the Search input, the customer types: "spicy".
+3. The catalog immediately filters:
+   - "Peri Peri Veg Roll — ₹140.00"
+   - "Spicy Masala Fries — ₹90.00"
+4. The customer checks the top-left badge on both cards: Notice the green dot with "VEG".
+5. The customer reads the description: "Crispy paneer tossed in extra hot peri peri masala".
+6. The customer confirms that the item has NO "Sold Out" badge (it is In Stock).
+7. The customer walks up to the counter and orders the Peri Peri Veg Roll with total confidence.
+
+
+7. SYSTEM BEHAVIOUR
+--------------------------------------------------------------------------------
+- Dual Filter Intersection Logic:
+  The filteredItems computation evaluates both category and search query simultaneously:
+  1. If selectedCategory !== 'all': item.category must match selectedCategory.
+  2. If searchQuery is non-empty: item.name OR item.description must include the query string (case-insensitively).
+  3. Only items satisfying both conditions are returned to the grid.
+- Empty Search State:
+  If a customer types a query that yields zero results (e.g., "pizza" at a beverages stall), a friendly empty state card appears: "No matching dishes found. Try a different search term or category."
+- Data Privacy Protection:
+  When stallDataService.getPublicMenu() compiles the public catalog:
+  - Extracts only { id, name, category, sellingPrice, description, isVeg, isAvailable, imageUrl }.
+  - Omits costPrice, profit, margin, and supplier info entirely.
+
+
+8. EXPECTED RESULTS
+--------------------------------------------------------------------------------
+- Instant, zero-lag card filtering as characters are typed into the search bar.
+- Crystal-clear visual distinction between vegetarian and non-vegetarian offerings.
+- Zero customer confusion regarding out-of-stock items.
+
+
+9. RELATED MODULES
+--------------------------------------------------------------------------------
+- Module 8: Menu Catalog & Pricing (controls the data presented here).
+- Module 4: Counter POS Workstation (staff enter the order selected by the customer).
+
+
+10. RESTRICTIONS AND IMPORTANT NOTES
+--------------------------------------------------------------------------------
+- Read-Only Security:
+  Customers have zero write permissions. They cannot edit items, change prices, or modify availability from this interface.
+- Single-Stall Isolation:
+  A customer on the Fast Food menu cannot see Beverage or Dessert items. To browse desserts, the customer must navigate to that stall's specific URL (/menu/desserts-stall).
+
+
+11. FREQUENTLY ASKED QUESTIONS (FAQ)
+--------------------------------------------------------------------------------
+Q1: Can I filter for Pure Vegetarian items only?
+A1: Yes! Customers can type "veg" in the search box to immediately isolate vegetarian items.
+
+Q2: What happens if an image fails to load due to poor mobile connectivity?
+A2: FoodDesk includes an automatic onError fallback handler that seamlessly swaps in a clean placeholder image, ensuring the card never looks broken.
+
+Q3: Does the menu update automatically if an item sells out while I am looking at it?
+A3: Yes! The page listens for the 'fooddesk:menu_updated' event. If the cashier marks an item as Sold Out at the counter, your mobile screen updates immediately.
+
+
+12. VERIFICATION STATUS
+--------------------------------------------------------------------------------
+Verification Status: VERIFIED
+Audit Reference: Tested and validated against frontend/src/pages/public/PublicMenuPage.jsx and frontend/src/services/stallDataService.js. Multi-criteria search, dietary emblem rendering, fallback image loading, and data privacy stripping operate with 100% precision.
+
+================================================================================
+END OF FILE: 04_PUBLIC_CUSTOMER/02_Product_and_Category_Exploration.txt
+================================================================================

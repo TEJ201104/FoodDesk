@@ -1,0 +1,81 @@
+flowchart TD
+    %% FoodDesk Comprehensive Module Interaction & Data Flow Architecture
+
+    subgraph StorageLayer["Browser Persistence Layer (localStorage)"]
+        StoreSession[("fooddesk_session")]
+        StoreStalls[("fooddesk_stalls")]
+        StoreMenu[("fooddesk_menu")]
+        StoreOrders[("fooddesk_orders")]
+        StorePayments[("fooddesk_payments")]
+        StoreExpenses[("fooddesk_expenses")]
+        StoreInventory[("fooddesk_inventory")]
+        StoreMovements[("fooddesk_stock_movements")]
+        StoreTickets[("fooddesk_tickets")]
+    end
+
+    subgraph ServiceLayer["Central Service Abstraction Layer"]
+        AuthService["mockAuthService.js"]
+        StallService["stallDataService.js"]
+        AnalyticsEngine["analyticsService.js"]
+        AdminService["adminService.js"]
+        StorageEngine["storageService.js"]
+    end
+
+    subgraph FrontOfHouse["Front-of-House Counter Workstations"]
+        M4_POS["Module 4: POS Workstation (/pos)"]
+        M5_Pay["Module 5: Payment & Receipts Modal"]
+        M7_Orders["Module 7: Order Management Hub (/orders)"]
+    end
+
+    subgraph BackOfHouse["Back-of-House Kitchen & Operations"]
+        M6_KDS["Module 6: Kitchen Display System (/kds)"]
+        M8_Menu["Module 8: Menu Catalog & Pricing (/menu)"]
+        M9_Inv["Module 9: Inventory & Wastage (/inventory)"]
+        M10_Exp["Module 10: Expense Management (/expenses)"]
+    end
+
+    subgraph ExecutiveLayer["Executive & Governance Interfaces"]
+        M2_Dash["Module 2: Stall Dashboard (/dashboard)"]
+        M11_Analytics["Module 11: Financial Analytics & P&L (/analytics)"]
+        M12_Admin["Module 12: Super Admin Governance (/admin/*)"]
+    end
+
+    subgraph CustomerLayer["Public Customer Interfaces"]
+        M13_PublicMenu["Module 13: Public Digital Menu (/menu/:slug)"]
+        M13_PublicTrack["Module 13: Public Order Tracker (/track/:slug/:order#)"]
+    end
+
+    %% Storage to Service Connections
+    StorageEngine <--> StorageLayer
+    AuthService <--> StorageEngine
+    StallService <--> StorageEngine
+    AnalyticsEngine <--> StorageEngine
+    AdminService <--> StorageEngine
+
+    %% Service to UI Connections
+    M4_POS -->|Create Order & Assign Token| StallService
+    M5_Pay -->|Record Cash/UPI Payment| StallService
+    M6_KDS <-->|Advance Order Status| StallService
+    M7_Orders <-->|Query Orders, Refund, Cancel| StallService
+    M8_Menu <-->|Catalog, Price, Sold-Out Toggle| StallService
+    M9_Inv <-->|Stock Adjustments & Wastage| StallService
+    M10_Exp <-->|Record Operational Expenses| StallService
+
+    M8_Menu -. Feeds Active Items .-> M4_POS
+    M8_Menu -. Strips COGS & Feeds .-> M13_PublicMenu
+
+    StallService -. Real-Time Event 'fooddesk:order-created' .-> M6_KDS
+    StallService -. Real-Time Event 'fooddesk:order-status-updated' .-> M13_PublicTrack
+    StallService -. Real-Time Event 'fooddesk:order-status-updated' .-> M7_Orders
+
+    %% Financial Aggregations
+    StoreOrders -. Paid Orders & Frozen COGS .-> AnalyticsEngine
+    StoreExpenses -. Operating Expenses .-> AnalyticsEngine
+    AnalyticsEngine -->|P&L Metrics, CSV, Print| M11_Analytics
+    AnalyticsEngine -->|Today's P&L Metrics| M2_Dash
+    StallService -->|Queue & Restock Counts| M2_Dash
+
+    %% Admin Governance Connections
+    AdminService <--> M12_Admin
+    M12_Admin -. Governs Stalls & Reset Demo Data .-> StorageLayer
+

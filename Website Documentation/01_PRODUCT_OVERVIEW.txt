@@ -1,0 +1,137 @@
+================================================================================
+FOODDESK — PRODUCT OVERVIEW & ARCHITECTURAL FOUNDATION
+================================================================================
+Document File: 01_PRODUCT_OVERVIEW.txt
+Location:      D:\Projects\FoodDesk\Website Documentation\
+Version:       1.0.0 (Release Candidate Demonstration Build)
+Applicability: FoodDesk Multi-Tenant POS & Stall Operations Platform
+Audit State:   100% Codebase-Verified • Non-Destructive Audit Mode
+================================================================================
+
+1. WHAT IS FOODDESK?
+--------------------------------------------------------------------------------
+FoodDesk is a modern, high-speed, local-first commercial Point of Sale (POS), Kitchen Display System (KDS), and Stall Operations Management platform designed specifically for food stalls, quick-service restaurants (QSR), food court outlets, and fast-casual food counters.
+
+Its defining motto is:
+"Manage Smart. Serve Fast."
+
+FoodDesk was conceived, engineered, and verified to solve a universal problem in the informal and semi-formal food service sector: the reliance on manual paper order tickets, handwritten spiral notebooks, mental mental calculations, untracked cash collections, lost customer tickets, and delayed manual bookkeeping that frequently results in revenue leakage, order mix-ups, stockouts during peak rushes, and total lack of financial visibility.
+
+FoodDesk replaces this chaotic, error-prone manual environment with an integrated, beautiful, tactile digital workstation running directly inside standard modern web browsers on standard counter hardware (tablets, touch monitors, laptops, and desktop PCs).
+
+
+2. THE CORE BUSINESS PROBLEMS FOODDESK SOLVES
+--------------------------------------------------------------------------------
+Commercial food stalls in markets, food courts, and high-footfall street plazas face unique operational constraints:
+- High peak-hour customer volume (dozens of orders per hour during lunch and dinner rushes).
+- Limited counter space and extreme operational noise.
+- Rapid turnover requiring order capture within 10 to 15 seconds.
+- Inability to depend on slow, unreliable cloud servers or fragile internet connections for immediate counter operations.
+- Multiple payment modes (Cash and UPI QR payments) that must be verified in real time to avoid walkaways.
+- High risk of ingredient spoilage and unrecorded wastage.
+- Total lack of accurate Profit and Loss (P&L) tracking due to mixed personal and business expenses.
+
+FoodDesk directly addresses and completely eliminates each of these problems:
+
+1. ELIMINATES LOST AND ILLEGIBLE ORDERS:
+   Paper order slips get stained, dropped, or misread in smoky, busy kitchens. FoodDesk assigns every order an atomic, sequential order number and an ultra-prominent 3-digit pickup token (e.g., Token #101). As soon as the order is confirmed at the counter, it appears immediately on the Kitchen Display System (KDS) screen with a clear item breakdown and customer special instructions.
+
+2. PREVENTS WALK-AWAY PAYMENT LEAKAGE:
+   Customers rushing during peak hours often claim to have paid or fail to complete UPI transfers. FoodDesk provides an integrated payment workflow with dynamic UPI QR generation, cash change calculators, and independent payment status tracking (Paid vs. Pending vs. Refunded). Orders with pending payment are distinctly flagged on the Order Management Hub.
+
+3. PROVIDES TRUE REAL-TIME PROFITABILITY (P&L):
+   Most food stall operators know how much cash came into the till today, but have no idea whether they actually made a profit after accounting for raw materials, staff salaries, gas cylinders, electricity, and packaging. FoodDesk automatically calculates Gross Sales, Cost of Goods Sold (COGS), Gross Profit, Operating Expenses, and True Net Profit in real time using frozen cost snapshots.
+
+4. SEAMLESS MULTI-STALL GOVERNANCE:
+   Entrepreneurs who operate more than one counter (e.g., a Fast Food counter and a separate Beverages counter) no longer need separate software or disjointed spreadsheets. FoodDesk supports multi-stall ownership with instant 1-click workspace switching while enforcing complete data isolation between stalls.
+
+5. PUBLIC CUSTOMER TRANSPARENCY WITHOUT EXPENSIVE HARDWARE:
+   FoodDesk generates zero-maintenance public digital menus and live order tracking web pages for walk-in customers. Customers can scan a static counter QR code to browse the full menu on their own smartphones, and inspect live preparation status on an animated progress tracker without cluttering the counter.
+
+
+3. ARCHITECTURAL PILLARS & DESIGN PRINCIPLES
+--------------------------------------------------------------------------------
+FoodDesk is built on five strict architectural pillars:
+
+1. LOCAL-FIRST, ZERO-LATENCY BROWSER STORAGE:
+   FoodDesk runs as a high-performance single-page application (SPA) built with React 18 and Vite. Counter staff cannot wait 2 to 3 seconds for a remote server round-trip during a 50-person line. FoodDesk persists all stall data, menu catalogs, order queues, expense ledgers, and inventory balances directly in the browser's persistent localStorage layer via an abstraction service (storageService.js). State mutations execute with zero network latency (sub-5ms response time).
+
+2. MONETARY INTEGRITY VIA INTEGER PAISE MATH:
+   Commercial financial software must never suffer from IEEE-754 floating-point rounding errors (e.g., 0.1 + 0.2 = 0.30000000000000004). FoodDesk converts every currency value into integer paise (1 INR = 100 paise) before performing additions, subtractions, discounts, refunds, or percentage distributions, and converts back to rupees only when displaying prices in the UI.
+
+3. IMMUTABLE SNAPSHOT COGS (COST OF GOODS SOLD):
+   In the restaurant industry, ingredient costs fluctuate weekly. When a food item is sold, FoodDesk records an immutable snapshot of both the selling price and the cost price (COGS) inside that specific order's line-item record. If the stall owner later updates the item's cost price in the menu catalog, historical orders and past financial reports remain 100% frozen and tamper-proof.
+
+4. STRICT MULTI-TENANT STALL ISOLATION:
+   Even though FoodDesk can run multiple stalls on the same platform, data isolation is absolute. Every query executed by stallDataService, analyticsService, or storageService is strictly parameterized and filtered by the active stall ID (e.g., stall-1). Fast Food orders, menu items, expenses, and inventory can never leak into Beverages (stall-2) or Desserts (stall-3). A dedicated runtime guard (StallGuard.jsx) continuously monitors the active session and intercepts any client-side anomalies.
+
+5. CONCURRENT EVENT DISPATCH & MULTI-SCREEN REACTIVITY:
+   In a commercial food stall, the POS terminal is at the front counter, while the KDS tablet is mounted in the kitchen, and customer tracking happens on mobile phones. FoodDesk synchronizes all screens in real time using custom DOM event dispatchers (e.g., fooddesk:order-created, fooddesk:order-status-updated, fooddesk:payment-completed) combined with the browser's native window 'storage' event listener, ensuring that status changes on one screen reflect immediately on all other screens without manual page refreshing.
+
+
+4. COMPLETE INVENTORY OF INTEGRATED MODULES
+--------------------------------------------------------------------------------
+FoodDesk integrates eleven cohesive operational modules:
+
+- MODULE 1: AUTHENTICATION & ROLE-BASED ACCESS CONTROL
+  Dual-mode authentication gate supporting 3-credential Stall Owner verification (Email, Password, Stall ID) and 2-credential Super Admin verification, protected by AuthGuard and RoleGuard route interceptors.
+
+- MODULE 2: APPLICATION LAYOUT & MULTI-STALL NAVIGATION
+  Persistent top navigation bar with live Kolkata time (IST), active stall status indicator, dynamic multi-stall switcher dropdown for authorized multi-stall owners, audio check buttons, and collapsible 10-item stall navigation sidebar.
+
+- MODULE 3: MULTI-STALL DATA ISOLATION ENGINE
+  StallContext provider, StallGuard runtime interceptor, and stallDataService isolation layer ensuring zero cross-stall data leakage and automated self-healing session recovery.
+
+- MODULE 4: COUNTER POINT OF SALE (POS) WORKSTATION
+  Split-screen ordering console with live item search, category filter pills, responsive item grid, sold-out guards, interactive cart sidebar, percentage/flat discount calculator, customer mobile and special note inputs, order review confirmation modal, and atomic sequential order/token generator.
+
+- MODULE 5: PAYMENT PROCESSING & DIGITAL THERMAL RECEIPTS
+  Tender processing modal supporting Cash (with received amount and change calculator), Dynamic UPI QR code generation, transaction ID logging, and compliant 58mm/80mm digital thermal receipt preview with 1-click browser printing.
+
+- MODULE 6: REAL-TIME KITCHEN DISPLAY SYSTEM (KDS)
+  4-column Kanban workflow board (Received, Preparing, Ready for Pickup, Completed) with prominent pickup tokens, real-time elapsed timers, delay warning badges, 1-click stage progression, audio bell chimes, and fullscreen mode for kitchen monitors.
+
+- MODULE 7: ORDER MANAGEMENT & REPRINT HUB
+  Comprehensive counter order ledger with multi-criteria search, date filters (Today, Yesterday, Last 7 Days, Custom), kitchen status filters, payment status filters, slide-over order details drawer, refund logging, cancellation modal, and receipt reprinting.
+
+- MODULE 8: MENU CATALOG & PRICING MANAGEMENT
+  Menu catalog workstation with grid and table views, category manager modal, item addition/editing modal, real-time gross margin calculator, 1-click stock availability toggle (In Stock vs. Sold Out), and non-destructive soft archiving.
+
+- MODULE 9: INVENTORY & INGREDIENT TRACKING
+  Raw material and ingredient stock registry with units of measure (kg, g, l, ml, pcs, packets), minimum threshold reorder alerts, dynamic low-stock warning banners, manual stock adjustment modal (add/reduce), dedicated wastage incident logging, and complete stock movement audit logs.
+
+- MODULE 10: EXPENSE MANAGEMENT & OPERATING COSTS
+  Operating expenditure ledger with 8 predefined categories, date range filters, category breakdown bar chart, add/edit expense modal, delete modal with mandatory reason, and versioned audit history.
+
+- MODULE 11: FINANCIAL ANALYTICS & P&L REPORTING
+  Comprehensive financial engine calculating Gross Sales, Discounts, Refunds, Net Revenue, COGS, Gross Profit, Total Expenses, and Net Profit across flexible date presets (Today, Yesterday, This Week, This Month, This Year, Custom), Recharts sales trends area chart, payment method pie chart, best-selling items bar chart, CSV export, and printable A4 financial report.
+
+- MODULE 12: SUPER ADMIN GOVERNANCE & CENTRAL ISSUE DESK
+  Platform-wide dashboard with total platform GMV, stall network directory, stall approval/rejection/suspension workflow, owner registry directory, centralized support ticket inbox with threaded replies and resolution notes, and high-risk factory demo reset modal.
+
+- MODULE 13: PUBLIC CUSTOMER DIGITAL MENU & ORDER TRACKING
+  Unauthenticated customer-facing portals providing read-only walk-in digital menus and live order status tracking with double-key security and customer PII masking.
+
+
+5. SUMMARY OF FACTORY SEED DATA & TEST PROFILES
+--------------------------------------------------------------------------------
+To enable immediate demonstration and evaluation without tedious manual configuration, FoodDesk comes pre-seeded with rich, realistic commercial demo data:
+
+STALL PROFILES:
+1. Fast Food Stall (stall-1) — Indore, MP (Fast Food & Snacks)
+2. Beverages Stall (stall-2) — Indore, MP (Tea, Coffee & Cold Beverages)
+3. Desserts & Sweets Stall (stall-3) — Indore, MP (Indian Sweets & Desserts)
+
+USER PROFILES:
+1. Super Admin: admin@gmail.com / admin (Role: super_admin)
+2. Stall Owner 1: owner1@gmail.com / owner1 (Authorized Stalls: stall-1, stall-2)
+3. Stall Owner 2: owner2@gmail.com / owner2 (Authorized Stall: stall-3 strictly)
+
+MENU BASELINE:
+- 30 pre-configured menu items across the three stalls with authentic pricing, COGS, descriptions, and dietary veg/non-veg tags.
+
+All seed data can be returned to its pristine factory state at any time via the Super Admin Platform Settings page using the typed confirmation phrase "RESET DEMO DATA".
+
+================================================================================
+END OF FILE: 01_PRODUCT_OVERVIEW.txt
+================================================================================

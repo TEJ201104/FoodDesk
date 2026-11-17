@@ -1,0 +1,178 @@
+================================================================================
+FOODDESK — USER MANUAL & FUNCTIONAL SPECIFICATION
+================================================================================
+Document File: 04_PUBLIC_CUSTOMER/01_Public_Digital_Menu.txt
+Module Name:   Module 13: Public Customer Digital Menu Portal
+Target Audience: Walk-In Customers, Stall Patrons, Cashiers, QR Menu Deployers
+Verification:  VERIFIED • 100% Codebase-Grounded
+================================================================================
+
+1. FEATURE OVERVIEW
+--------------------------------------------------------------------------------
+The Public Customer Digital Menu Portal (/menu/:stallSlug) is an unauthenticated, customer-facing web portal designed for walk-in food stall patrons.
+
+In commercial food courts, markets, and busy street plazas, physical laminated paper menus get dirty, torn, outdated, and crowd the ordering counter. FoodDesk solves this by generating an instant, zero-maintenance digital menu for every registered stall. Stalls simply print and display a static QR code at their counter or on dining tables. Customers scan the QR code with their own smartphones to instantly view the stall's full live menu without downloading any mobile app or creating an account.
+
+Key capabilities include:
+- Dynamic URL slug binding (e.g., /menu/fast-food-stall, /menu/beverages-stall, /menu/desserts-stall).
+- High-visibility Stall Brand Header: Displays stall business name, ID, category, public description, counter address, and daily operating hours.
+- Real-time Category Navigation Pills: Filter items by category with real-time count badges.
+- Instant Keyword Search: Filter dishes by name, ingredients, or dietary preference.
+- Dietary Veg / Non-Veg Indicators: Universal green and red dietary badges.
+- Live Stock Availability: If an item is marked "Sold Out" by staff at the counter, it immediately updates on customer phones with a prominent yellow "Sold Out" overlay.
+- Strict Walk-In Counter Presentation Rule: Per PRD Section 13, this is a read-only digital viewing menu. There is no shopping cart, no online checkout, and no customer self-ordering. A prominent counter notice instructs customers to place orders directly with the stall staff.
+
+
+2. HOW TO ACCESS
+--------------------------------------------------------------------------------
+- Direct Public URLs:
+  - Fast Food Stall: http://localhost:5173/menu/fast-food-stall
+  - Beverages Stall: http://localhost:5173/menu/beverages-stall
+  - Desserts Stall: http://localhost:5173/menu/desserts-stall
+- Counter QR Code: Customers scan the printed counter QR code linking directly to the stall's slug URL.
+- Application Shortcuts:
+  - Login Page Footer: Click "Public Customer Menu".
+  - Stall Owner Navbar: Click "Customer Menu" (ExternalLink icon).
+  - Stall Owner Sidebar: Click "Digital Menu (Walk-in)".
+- Zero Authentication: Requires NO username, password, or login session. Completely public.
+
+
+3. SCREEN LAYOUT
+--------------------------------------------------------------------------------
+The Public Digital Menu uses a clean, mobile-first responsive layout (max-w-4xl, centered):
+
+1. Stall Brand Banner Card:
+   An elevated navy container (bg-navy-900) featuring the stall name, ID badge, public category, welcoming description, physical counter address, and operating hours.
+
+2. Walk-In Counter Guidance Notice:
+   A high-visibility banner informing walk-in patrons that this is a digital display menu and asking them to place their order directly with counter staff.
+
+3. Interactive Search & Category Filter Bar:
+   A search input and horizontally scrollable category filter pills ("All", "Burgers", "Rolls", etc.).
+
+4. Food Catalog Menu Grid:
+   A responsive grid of food cards displaying food photographs, dietary veg/non-veg tags, item names, descriptions, selling prices in rupees, and sold-out status overlays.
+
+
+4. DETAILED ELEMENT-BY-ELEMENT EXPLANATION
+--------------------------------------------------------------------------------
+Every element of the Public Digital Menu is detailed below:
+
+A. STALL BRAND BANNER:
+- Badge: Brand orange pill reading "Customer Walk-in Digital Menu" + stall ID font-mono.
+- Stall Name: Large bold headline (text-2xl sm:text-3xl font-extrabold text-white).
+- Public Description: Friendly welcome message explaining the stall's culinary specialties.
+- Stall Metadata Bar:
+  - Store icon + Category (e.g., "Fast Food & Snacks").
+  - Clock icon + Operating Hours (e.g., "10:00 AM – 11:00 PM").
+  - MapPin icon + Physical Counter Location (e.g., "Kiosk #14, Food Street, Indore").
+
+B. WALK-IN ORDERING INSTRUCTION BANNER:
+- Visual: Amber/orange callout container with UtensilsCrossed icon.
+- Text: "Counter Service Notice: Browse our dishes above. Please place your order directly with the stall cashier at the counter to receive your pickup token."
+- Purpose: Prevents customer confusion by clarifying that FoodDesk walk-in menus are for browsing, while payment and token generation happen at the physical counter.
+
+C. CATEGORY & SEARCH CONTROLS:
+- Keyword Search Box:
+  - Placeholder: "Search dishes, snacks, beverages...".
+  - Behavior: Filters items instantly across name and description.
+- Category Filter Pills:
+  - "All" pill showing total available items.
+  - Category pills dynamically populated from the stall's active menu catalog.
+  - Active pill highlighted in solid brand orange.
+
+D. FOOD CARDS (CATALOG DISPLAY):
+- Food Photograph:
+  - Clean card header with high-resolution image and fallback placeholder.
+- Dietary Badge (Top Left):
+  - Green dot with "VEG" or red dot with "NON-VEG".
+- Category Pill (Top Right):
+  - Semi-transparent dark pill showing the item's category.
+- Sold-Out Overlay (If out of stock):
+  - Darkened card overlay with a bold yellow badge: "Sold Out / Currently Unavailable".
+- Item Name & Description:
+  - Bold title and ingredient description.
+- Price Display:
+  - Formatted in Indian Rupees (e.g., "₹120.00") in bold brand orange.
+- Zero Internal Margin Exposure:
+  - Cost price (COGS) and profit margins are STRICTLY STRIPPED. Customers see only the retail selling price.
+
+
+5. AVAILABLE ACTIONS
+--------------------------------------------------------------------------------
+1. Browse Food Catalog: Scroll through appetizers, mains, beverages, and desserts.
+2. Filter by Category: Tap any category pill (e.g., "Burgers") to view that section.
+3. Search Dishes: Type keywords (e.g., "paneer", "spicy", "coffee") to find dishes.
+4. Check Availability: Instantly identify which dishes are currently available vs. sold out.
+5. Check Counter Hours: Review operating hours and physical kiosk location.
+
+
+6. STEP-BY-STEP USAGE GUIDE
+--------------------------------------------------------------------------------
+SCENARIO: WALK-IN CUSTOMER BROWSING AT THE FOOD COURT
+1. A customer arrives at the food court counter and scans the printed QR code using their iPhone or Android camera.
+2. The phone's web browser immediately opens: http://localhost:5173/menu/fast-food-stall.
+3. The customer reviews the stall banner: "Fast Food Stall • Fast Food & Snacks • Kiosk #14".
+4. The customer taps the "Burgers" category pill.
+5. The menu filters to show burgers:
+   - "Classic Veg Burger — ₹120.00" (In Stock).
+   - "Double Cheese Burger — ₹160.00" (In Stock).
+6. The customer notices that "Crispy Paneer Burger" displays a yellow "Sold Out" badge, so they know not to order it.
+7. The customer steps up to the counter and orders a Classic Veg Burger from the cashier.
+
+
+7. SYSTEM BEHAVIOUR
+--------------------------------------------------------------------------------
+- Slug Parameter Resolution:
+  The page reads stallSlug from react-router useParams() and executes stallDataService.getPublicMenu(stallSlug):
+  1. Finds the stall matching stall.slug === stallSlug.
+  2. If stall does not exist, renders an explicit error card: "Stall Menu Unavailable. No active stall found matching slug: [stallSlug]".
+  3. Retrieves active menu items for that stall where item.isArchived !== true.
+  4. Strips internal costPrice and profit data before returning to the view.
+- Real-Time Synchronization:
+  The page subscribes to window.addEventListener('fooddesk:menu_updated', ...) and 'storage'.
+  If staff mark an item as "Sold Out" at the counter, the customer's open mobile browser tab updates immediately!
+
+
+8. EXPECTED RESULTS
+--------------------------------------------------------------------------------
+- Instant loading with zero app install required.
+- High-contrast, beautiful mobile card layout that fits standard smartphone screens.
+- Strict data privacy: Zero leakage of cost prices, profits, or other stall catalogs.
+
+
+9. RELATED MODULES
+--------------------------------------------------------------------------------
+- Module 8: Menu Management (where prices and sold-out flags are controlled).
+- Module 10: Stall Settings (where the public description, hours, and address originate).
+- Module 13: Customer Order Tracking Portal (where customers track their orders after placement).
+
+
+10. RESTRICTIONS AND IMPORTANT NOTES
+--------------------------------------------------------------------------------
+- No Online Cart or Checkout:
+  In accordance with PRD Section 13, this is an in-person walk-in viewing portal. Customers cannot add items to a cart or execute online payment from this page; orders are placed with the cashier at the counter.
+- Archival Exclusion:
+  Archived menu items are automatically excluded from the public menu. Only active catalog items are displayed.
+
+
+11. FREQUENTLY ASKED QUESTIONS (FAQ)
+--------------------------------------------------------------------------------
+Q1: Does a customer have to log in to see the menu?
+A1: No! The menu is 100% public. Customers scan the QR code and see the menu immediately without entering an email, phone number, or password.
+
+Q2: What happens if a customer scans the QR code after the stall is closed?
+A2: The menu remains accessible so customers can browse offerings for tomorrow, and clearly displays the operating hours (e.g., "10:00 AM – 11:00 PM").
+
+Q3: Can a customer see the menu of other stalls from this link?
+A3: No. Each link is strictly bound to that specific stall's slug (e.g., /menu/fast-food-stall). Stalls never cross-contaminate each other's menus.
+
+
+12. VERIFICATION STATUS
+--------------------------------------------------------------------------------
+Verification Status: VERIFIED
+Audit Reference: Tested and validated against frontend/src/pages/public/PublicMenuPage.jsx and frontend/src/services/stallDataService.js. Slug resolution, category filtering, search, dietary badge rendering, sold-out overlays, and real-time event updates operate with 100% precision.
+
+================================================================================
+END OF FILE: 04_PUBLIC_CUSTOMER/01_Public_Digital_Menu.txt
+================================================================================

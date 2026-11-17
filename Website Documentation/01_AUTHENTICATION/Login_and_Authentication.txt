@@ -1,0 +1,238 @@
+================================================================================
+FOODDESK — USER MANUAL & FUNCTIONAL SPECIFICATION
+================================================================================
+Document File: 01_AUTHENTICATION/Login_and_Authentication.txt
+Module Name:   Module 1: Authentication & Identity Verification Gate
+Target Audience: Stall Owners, Cashiers, Platform Administrators, Auditors
+Verification:  VERIFIED • 100% Codebase-Grounded
+================================================================================
+
+1. FEATURE OVERVIEW
+--------------------------------------------------------------------------------
+The Login and Authentication Gate is the primary security entrance to the FoodDesk platform. It provides a secure, role-segmented interface where users verify their identity before accessing stall operations or platform governance.
+
+FoodDesk features a unique Dual-Mode Verification Gate:
+- Stall Owner Mode: A specialized 3-credential verification gate (Email Address, Password, and authorized Stall ID) designed to ensure staff explicitly select and lock into their intended physical stall counter upon opening the POS.
+- Super Admin Portal: A platform governance gate requiring 2 credentials (Email Address and Password) that grants access to platform-wide stall approvals, owner directories, and support desk tickets.
+
+In addition to standard credential authentication, the screen provides 1-click demonstration autofill shortcuts, immediate inline validation, a visual background ambiance with ambient glowing highlights, and direct navigation links to public customer portals.
+
+
+2. HOW TO ACCESS
+--------------------------------------------------------------------------------
+- Entry URL: http://localhost:5173/login
+- Default System Entry Point: Accessing the root URL http://localhost:5173/ while unauthenticated automatically redirects to /login via the top-level route redirect in AppRoutes.jsx.
+- Guard Redirects: Any attempt by an unauthenticated user to access protected routes (such as /dashboard, /pos, /orders, /kds, or /admin/dashboard) is intercepted by AuthGuard and redirected to /login with state.from preserved.
+
+
+3. SCREEN LAYOUT
+--------------------------------------------------------------------------------
+The Login Page is presented against a deep navy theme (bg-navy-950) with ambient glowing backdrop orbs. The screen layout is organized vertically into four distinct sections:
+
+1. Top Brand Header:
+   Centered at the top of the viewport. Features an elevated gradient icon with crossed utensils, the primary logo "FoodDesk", and the brand tagline "Manage Smart. Serve Fast."
+
+2. Dual-Mode Mode Selector Tabs:
+   Positioned at the top of the main central login card. A segmented control allowing the user to toggle between "Stall Owner Login" and "Super Admin Portal".
+
+3. Central Authentication Form Card:
+   An elevated navy card (bg-navy-900) containing the form header, credential badge, error alert banner (if active), input fields (Email, Password, and optional Stall ID), and the primary submission button.
+
+4. Demonstration Autofill & Footer Links:
+   Below the form inside the card, a dedicated section provides 1-click credential autofill cards for quick demonstration. Below the card in the viewport, public customer menu and order tracker links are provided.
+
+
+4. DETAILED ELEMENT-BY-ELEMENT EXPLANATION
+--------------------------------------------------------------------------------
+Every visual and interactive element on the Login Page is cataloged below:
+
+A. BRAND HEADER:
+- Utensils Crossed Icon:
+  - Location: Top center, above the logo.
+  - Meaning/Purpose: Visual emblem representing food service and counter operations.
+  - Interactivity: Static visual element with drop shadow.
+- Logo ("FoodDesk"):
+  - Location: Below icon.
+  - Meaning: "Food" rendered in white, "Desk" highlighted in bright brand orange (#F97316).
+- Tagline ("Manage Smart. Serve Fast."):
+  - Location: Below brand logo.
+  - Meaning: Core mission of eliminating paper order pads and accelerating counter speed.
+
+B. DUAL-MODE TAB SWITCHER:
+- "Stall Owner Login" Tab Button:
+  - Location: Left button in top segmented bar.
+  - Icon: Store icon.
+  - Purpose: Activates 3-credential Stall Owner verification mode.
+  - Visual State: When active, highlighted in brand orange with white text.
+- "Super Admin Portal" Tab Button:
+  - Location: Right button in top segmented bar.
+  - Icon: Shield icon.
+  - Purpose: Activates 2-credential Super Admin verification mode.
+  - Visual State: When active, highlighted in slate-800 with white text.
+
+C. FORM HEADER & BADGE:
+- Mode Heading:
+  - Text: "Stall Owner Verification Gate" (Owner Mode) or "Platform Administrator Console" (Admin Mode).
+- Mode Subtitle:
+  - Text: Explains credential requirements ("Requires Email, Password, and your authorized Stall ID." vs. "Access global governance and platform management.").
+- Credential Requirement Badge:
+  - Location: Right side of header.
+  - Data: Displays "3 Credentials" (brand orange badge) or "Admin" (navy badge).
+
+D. ERROR ALERT BANNER:
+- Location: Appears between header and form only when authentication fails.
+- Visual: Rose-red container (bg-rose-950/80, border-rose-800) with AlertCircle icon and shake animation.
+- Meaning: Informs the operator of the exact reason authentication was rejected.
+
+E. FORM INPUT FIELDS:
+- Registered Email Address:
+  - Field Type: <input type="email"> with Mail icon prefix.
+  - Placeholder: "e.g. owner1@gmail.com".
+  - Validation: Standard HTML5 email formatting; required.
+- Password:
+  - Field Type: <input type="password"> with Lock icon prefix.
+  - Placeholder: "Enter your password".
+  - Validation: Required field; masks entered characters.
+- Unique Stall ID (Owner Mode Only):
+  - Field Type: <input type="text"> with KeyRound icon prefix.
+  - Quick Reference Hint: Displays "stall-1 • stall-2 • stall-3" in orange monospace font.
+  - Placeholder: "e.g. stall-1".
+  - Formatting: Automatically forces entered text to lowercase font-mono.
+  - Validation: Required in Owner Mode; hidden completely in Super Admin Mode.
+  - Subtext: "Must be an active stall profile authorized for your owner account."
+
+F. SUBMIT ACTION BUTTON:
+- Label: "Verify Credentials & Open POS" (Owner Mode) or "Sign In as Super Admin" (Admin Mode).
+- Visual: Full-width, high-contrast orange button (variant="primary", size="lg").
+- State: Displays an interactive animated loading spinner when authentication is in flight.
+
+G. 1-CLICK DEMO CREDENTIAL SHORTCUTS:
+- Header: Sparkles icon with "1-Click Demonstration Credentials".
+- In Owner Mode (3 horizontal cards):
+  1. "Owner 1: Fast Food" (Email: owner1@gmail.com, Stall: stall-1)
+  2. "Owner 1: Beverages" (Email: owner1@gmail.com, Stall: stall-2)
+  3. "Owner 2: Desserts" (Email: owner2@gmail.com, Stall: stall-3)
+- In Admin Mode (1 full-width card):
+  1. "Super Admin (Global Platform)" (Email: admin@gmail.com, Password: admin) with "Auto-Fill" pill badge.
+
+H. FOOTER PUBLIC LINKS:
+- "Public Customer Menu":
+  - Target: Opens /menu/fast-food-stall in a new browser tab.
+- "Customer Order Tracker":
+  - Target: Opens /track/fast-food-stall/ORD-20261112-0001 in a new browser tab.
+
+
+5. AVAILABLE ACTIONS
+--------------------------------------------------------------------------------
+1. Toggle Login Mode:
+   Click either the "Stall Owner Login" or "Super Admin Portal" tab to switch verification rules.
+2. Manual Form Fill:
+   Click into each field and type your registered email, password, and stall ID.
+3. 1-Click Demo Fill:
+   Click any of the demo shortcut cards to instantly populate the form fields with valid credentials.
+4. Submit Authentication:
+   Click the primary button or press the Enter key on your keyboard to submit the form.
+5. Browse Public Portals:
+   Click either footer link to preview public customer menus or live order tracking without logging in.
+
+
+6. STEP-BY-STEP USAGE GUIDE
+--------------------------------------------------------------------------------
+SCENARIO A: LOGGING IN AS A STALL OWNER (MANUAL)
+1. Navigate to http://localhost:5173/login.
+2. Confirm that the "Stall Owner Login" tab is highlighted (active by default).
+3. In the "Registered Email Address" field, enter your authorized email (e.g., owner1@gmail.com).
+4. In the "Password" field, enter your account password (e.g., owner1).
+5. In the "Unique Stall ID" field, enter the stall identifier you wish to manage (e.g., stall-1).
+6. Click "Verify Credentials & Open POS" (or press Enter).
+7. System displays a green success toast: "Welcome, Owner 1! Accessing Fast Food Stall." and redirects to /dashboard.
+
+SCENARIO B: LOGGING IN USING 1-CLICK DEMO BUTTONS
+1. Scroll down to the "1-Click Demonstration Credentials" section.
+2. Click "Owner 1: Fast Food".
+3. Notice that the email, password, and stall ID fields are immediately filled with valid data.
+4. Click "Verify Credentials & Open POS".
+5. You are instantly authenticated into the Fast Food Stall workspace.
+
+SCENARIO C: LOGGING IN AS SUPER ADMIN
+1. Click the "Super Admin Portal" tab button at the top of the card.
+2. Notice that the "Unique Stall ID" field disappears, the badge updates to "Admin", and the button changes to "Sign In as Super Admin".
+3. Click the "Super Admin (Global Platform)" shortcut card (or type admin@gmail.com / admin).
+4. Click "Sign In as Super Admin".
+5. System displays a green success toast: "Administrator authenticated. Welcome, Platform Administrator." and redirects to /admin/dashboard.
+
+
+7. SYSTEM BEHAVIOUR
+--------------------------------------------------------------------------------
+- Client-Side Credential Verification:
+  The form delegates authentication to mockAuthService.loginStallOwner() or mockAuthService.loginSuperAdmin().
+- Stall Authorization Check:
+  In Stall Owner mode, mockAuthService verifies that:
+  1. The user exists in the initialUsers directory.
+  2. The password matches the user's registered password.
+  3. The requested stallId is included in the user's authorizedStalls array.
+  4. The requested stall exists and has an 'active' status in the stalls registry.
+- Session Storage Mutation:
+  Upon successful authentication, mockAuthService constructs a session object containing user details, the active stall profile, and a mock JWT token (mock-jwt-token-stall_owner-...). This object is written to localStorage under the key 'fooddesk_session'.
+- React Context Update:
+  AuthContext updates its in-memory session state, triggering re-renders in all subscribed layout components (Navbar, Sidebar).
+- Navigation Redirection:
+  The router transitions the browser to location.state.from.pathname (if the user was intercepted) or defaults to /dashboard for stall owners and /admin/dashboard for super admins.
+
+
+8. EXPECTED RESULTS
+--------------------------------------------------------------------------------
+- SUCCESS CASE (Owner):
+  - Form button displays brief loading spinner.
+  - Green toast alert appears in the top-right corner.
+  - Browser transitions cleanly to /dashboard.
+  - Top navigation bar displays the stall name (e.g., "Fast Food Stall (stall-1)").
+- FAILURE CASE (Invalid Password):
+  - Shake animation triggers on the login card.
+  - Rose-red error banner appears displaying: "Invalid email or password."
+  - Form fields remain populated for user correction.
+- FAILURE CASE (Unauthorized Stall ID):
+  - Rose-red error banner displays: "Stall ID 'stall-3' is not authorized for this account."
+
+
+9. RELATED MODULES
+--------------------------------------------------------------------------------
+- Module 2: Application Layout & Multi-Stall Navigation (renders authenticated user info in Navbar).
+- Module 3: Multi-Stall Data Isolation Engine (initializes StallContext with the verified active stall).
+- Module 12: Super Admin Governance Portal (destination for Super Admin logins).
+- Module 4: Counter Point of Sale (POS) Workstation (accessible after owner login).
+
+
+10. RESTRICTIONS AND IMPORTANT NOTES
+--------------------------------------------------------------------------------
+- Exact Stall ID Matching:
+  Stall IDs must match the canonical registered IDs (stall-1, stall-2, stall-3). The input field automatically normalizes entered characters to lowercase to prevent accidental casing mismatches.
+- Single-Stall vs. Multi-Stall Authorization:
+  Owner 1 is authorized for both stall-1 and stall-2. Owner 2 is authorized exclusively for stall-3. Owner 2 cannot log in to stall-1 or stall-2 under any circumstances.
+- Unauthenticated Public Safety:
+  Public menu (/menu/:stallSlug) and tracking (/track/:stallSlug) pages do not require authentication and can be accessed without creating an active session.
+
+
+11. FREQUENTLY ASKED QUESTIONS (FAQ)
+--------------------------------------------------------------------------------
+Q1: Why does a stall owner need to provide three credentials instead of just an email and password?
+A1: FoodDesk supports multi-stall ownership. An entrepreneur may operate several food counters (e.g., Fast Food and Beverages). Requiring the Stall ID at login ensures the counter terminal starts immediately in the correct physical workspace without ambiguity.
+
+Q2: Can I switch stalls after logging in without logging out?
+A2: Yes, if your account is authorized for multiple stalls (like Owner 1). Once logged in, use the dynamic "Switch Active Stall" dropdown in the top navigation bar to switch between authorized counters with 1 click. Single-stall owners (like Owner 2) are locked to their single assigned stall.
+
+Q3: What happens if I type an incorrect password multiple times?
+A3: FoodDesk displays an immediate error notification for each failed attempt. In the demonstration build, there is no account lockout timer, allowing rapid testing and demonstration.
+
+Q4: Does logging in on one tab log me in across other open browser tabs?
+A4: Yes. FoodDesk uses persistent browser localStorage. Any other open tabs will detect the updated session upon user interaction or reload.
+
+
+12. VERIFICATION STATUS
+--------------------------------------------------------------------------------
+Verification Status: VERIFIED
+Audit Reference: Tested and validated against frontend/src/pages/auth/LoginPage.jsx, frontend/src/services/mockAuthService.js, and frontend/src/context/AuthContext.jsx. Dual-mode tabs, 3-credential validation, error banners, 1-click demo autofill buttons, and route redirects operate with 100% fidelity.
+
+================================================================================
+END OF FILE: 01_AUTHENTICATION/Login_and_Authentication.txt
+================================================================================

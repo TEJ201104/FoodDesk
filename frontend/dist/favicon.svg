@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <rect width="48" height="48" rx="12" fill="#0f172a"/>
+  <!-- FoodDesk stylized stall & counter badge -->
+  <path d="M10 20 L24 10 L38 20 L38 24 L10 24 Z" fill="#f97316"/>
+  <rect x="13" y="26" width="22" height="13" rx="2" fill="#ffffff" fill-opacity="0.95"/>
+  <rect x="16" y="29" width="16" height="3" rx="1.5" fill="#0f172a"/>
+  <circle cx="24" cy="35" r="2" fill="#f97316"/>
+</svg>
+

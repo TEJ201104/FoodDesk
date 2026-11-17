@@ -1,0 +1,61 @@
+flowchart TD
+    %% FoodDesk Point of Sale (POS) Order & Cart Calculation Flow
+
+    Start(["Cashier Opens POS Workstation (/pos)"]) --> LoadMenu["Load Stall Menu & Categories from stallDataService"]
+    LoadMenu --> RenderUI["Render Category Pills, Food Cards Grid & Sticky Cart"]
+    
+    %% User Interactions in POS
+    RenderUI --> ActionChoice{Cashier Action}
+    ActionChoice -- Search Query --> FilterGrid["Filter Dishes by Name / Ingredients"]
+    ActionChoice -- Category Pill --> FilterCategory["Filter Dishes by Category"]
+    ActionChoice -- Click Add Item --> CheckAvailable{Is Item In Stock?}
+    
+    CheckAvailable -- No (Sold Out) --> BlockToast["Show Warning Toast: Item is Sold Out"]
+    BlockToast --> RenderUI
+    
+    CheckAvailable -- Yes --> AddCart["Add Item to Cart or Increment Quantity"]
+    AddCart --> PlayChime["Play 1200Hz Item Add Chime"]
+    PlayChime --> RecalcCart["Recalculate Subtotal, Discounts & Grand Total"]
+    
+    %% Cart Adjustments
+    RecalcCart --> CartAction{Cart Customization}
+    CartAction -- Modify Quantity --> UpdateQty["Increment [+] or Decrement [-] Qty"]
+    UpdateQty --> RecalcCart
+    
+    CartAction -- Apply Discount --> DiscChoice{Discount Type}
+    DiscChoice -- Percentage --> CalcPercent["Apply Percent Discount (Capped at 100%)"]
+    DiscChoice -- Flat Rupee --> CalcFlat["Apply Flat Rupee Discount (Capped at Subtotal)"]
+    CalcPercent --> RecalcCart
+    CalcFlat --> RecalcCart
+    
+    CartAction -- Enter Details --> CustomerMeta["Record Customer Mobile & Special Notes"]
+    CustomerMeta --> ReviewBtn["Click 'Review & Place Order'"]
+    
+    %% Review Modal
+    ReviewBtn --> ReviewModal["Open POSOrderReviewModal"]
+    ReviewModal --> CheckReview{Cashier Confirms Details?}
+    CheckReview -- No (Edit) --> RenderUI
+    CheckReview -- Yes (Confirm) --> ExecuteCreate["Call stallDataService.createOrder()"]
+    
+    %% Atomic Order Creation
+    subgraph OrderCreationEngine["Atomic Order Creation (stallDataService)"]
+        ExecuteCreate --> SeqNum["Generate Order Number (ORD-YYYYMMDD-XXXX)"]
+        SeqNum --> SeqToken["Allocate Sequential Pickup Token (#101-#999)"]
+        SeqToken --> FreezeCOGS["Freeze Selling Price & Cost Price (COGS) Snapshots"]
+        FreezeCOGS --> SaveStorage["Write Order Record to 'fooddesk_orders' in localStorage"]
+        SaveStorage --> DispatchEvent["Dispatch 'fooddesk:order-created' & 'storage' Events"]
+    end
+    
+    %% Success & Post-Order
+    DispatchEvent --> SuccessChime["Play Harmonic Success Audio Chime"]
+    SuccessChime --> SuccessModal["Display POSOrderSuccessModal with Giant Token"]
+    
+    SuccessModal --> NextChoice{Cashier Next Step}
+    NextChoice -- Collect Payment --> PaymentModal["Open POSPaymentModal (Cash / UPI)"]
+    NextChoice -- Print Receipt --> ThermalModal["Open DigitalThermalReceiptModal (58mm/80mm)"]
+    NextChoice -- Start Next Order --> ClearCart["Clear Cart & Reset Workstation for Next Customer"]
+    
+    PaymentModal --> ThermalModal
+    ThermalModal --> ClearCart
+    ClearCart --> RenderUI
+

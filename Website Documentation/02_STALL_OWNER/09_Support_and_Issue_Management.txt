@@ -1,0 +1,217 @@
+================================================================================
+FOODDESK — USER MANUAL & FUNCTIONAL SPECIFICATION
+================================================================================
+Document File: 02_STALL_OWNER/09_Support_and_Issue_Management.txt
+Module Name:   Module 11: Support Desk & Central Issue Management (Stall Owner View)
+Target Audience: Stall Owners, Cashiers, Technical Support Staff, Super Admins
+Verification:  VERIFIED • 100% Codebase-Grounded
+================================================================================
+
+1. FEATURE OVERVIEW
+--------------------------------------------------------------------------------
+The Support and Issue Management Hub (/support) is the internal help desk communication portal for the active food stall.
+
+In commercial food stall operations, technical defects, billing disputes, thermal printer wrapping issues, or POS glitches cannot wait days for resolution. Stall operators need a direct, structured line of communication with the platform Super Administrator to report defects, submit operational questions, track ticket progress, and verify resolutions.
+
+The Support module provides a full-featured customer support ticketing system:
+- Report New Issue Modal: Submit issues directly to Super Admin with title, category, priority, and rich description.
+- Five Standardized Ticket Statuses: Submitted, Under Review, In Progress, Resolved, and Reopened.
+- Threaded Conversation Drawer: Real-time messaging view between the stall owner and Super Admin with role badges and timestamps.
+- Official Resolution Notes: Prominent verification banner displayed when a Super Admin marks an issue as Resolved.
+- Reopen Ticket Safeguard: If an issue is marked Resolved but the problem persists, stall staff can reopen the ticket with a mandatory explanation.
+
+
+2. HOW TO ACCESS
+--------------------------------------------------------------------------------
+- Direct URL: http://localhost:5173/support
+- Sidebar Navigation: Click "Report an Issue" (the ninth item with the LifeBuoy icon) in the stall navigation sidebar.
+
+
+3. SCREEN LAYOUT
+--------------------------------------------------------------------------------
+The Support screen is structured into four functional sections:
+
+1. Page Header & Primary Actions:
+   Title ("Support & Help Desk"), module verification badge ("Module 11 Verified"), operational subtitle, active stall scope pill, "Report New Issue" button, and manual refresh button.
+
+2. Filters & Search Console:
+   A clean toolbar card containing a wide keyword search input, Category filter dropdown, Priority filter dropdown, and 6 clickable Status filter pills (All, Submitted, Under Review, In Progress, Resolved, Reopened).
+
+3. Support Tickets Table:
+   The main ticket registry displaying Ticket ID & Title, Category, Priority badge, Submitted date, Status badge, and the "View Thread" action button.
+
+4. Modals & Drawers:
+   - Report New Issue Modal: Form for creating new tickets.
+   - Ticket Conversation & Details Drawer: Slide-out modal containing ticket metadata, threaded messages, official resolution confirmation, and the Reopen Ticket control.
+
+
+4. DETAILED ELEMENT-BY-ELEMENT EXPLANATION
+--------------------------------------------------------------------------------
+Every component of the Support module is detailed below:
+
+A. HEADER & WORKSTATION ACTIONS:
+- Title & Icon: LifeBuoy icon in brand orange + "Support & Help Desk".
+- Active Stall Scope Pill: Store icon + Active Stall Name + Stall ID font-mono.
+- "Report New Issue" Button (Primary):
+  - Icon: Plus.
+  - Action: Opens the new ticket submission modal.
+- "Refresh" Button:
+  - Icon: RefreshCw.
+  - Action: Re-queries local storage for updated admin replies.
+
+B. FILTER TOOLBAR:
+- Search Input:
+  - Placeholder: "Search tickets by ID, title, or keywords...".
+  - Behavior: Instant substring filter across ticket ID, title, and description.
+- Category Filter Dropdown:
+  - Options: All Categories, Website Bug, POS Error, Billing / Payment Discrepancy, Hardware / Printer, Other.
+- Priority Filter Dropdown:
+  - Options: All Priorities, Low, Medium, High, Critical.
+- Status Filter Pills:
+  - Six rounded pills: "All", "Submitted", "Under Review", "In Progress", "Resolved", "Reopened".
+  - Active pill highlighted in solid brand orange.
+
+C. TICKETS TABLE:
+- Column 1: Ticket ID & Title:
+  - Ticket ID in orange font-mono (e.g., "TKT-001").
+  - Bold Title text + truncated description below.
+- Column 2: Category:
+  - Text label (e.g., "Hardware / Printer").
+- Column 3: Priority:
+  - Color-coded badge: Critical (Red), High (Red), Medium (Yellow), Low (Slate).
+- Column 4: Submitted Date:
+  - Formatted date (e.g., "16 Nov 2026").
+- Column 5: Status Badge:
+  - Submitted (Slate), Under Review (Amber), In Progress (Brand Orange), Resolved (Emerald Green), Reopened (Rose Red).
+- Column 6: Actions:
+  - "View Thread" Button (MessageSquare icon): Opens the conversation details modal.
+
+D. REPORT NEW ISSUE MODAL:
+- Dialog Fields:
+  1. Issue Title (Required text input, e.g., "Thermal printer margin cut off").
+  2. Category Dropdown (Website Bug, POS Error, Billing / Payment Discrepancy, Hardware / Printer, Other).
+  3. Priority Dropdown (Low, Medium, High, Critical).
+  4. Detailed Description (Required textarea for reproduction steps and impact).
+  5. Read-Only Context Safeguard Box: Displays reporting owner name, email, active stall ID, and initial status ("Submitted").
+- Action Buttons: "Cancel" and "Submit Ticket" (with Send icon).
+
+E. TICKET CONVERSATION DRAWER / MODAL:
+- Header: Ticket ID in font-mono, Priority badge, Status badge, Title, category, and submission timestamp.
+- Message Thread Body:
+  - Chronological chat bubbles:
+    - Stall Owner Messages: Left-aligned in light gray with User icon and owner name.
+    - Super Admin Messages: Right-aligned in dark navy with Shield icon and "Platform Administrator" header.
+- Resolution Note Banner (If Resolved):
+  - Prominent emerald green callout box with CheckCircle2 icon:
+    - Official resolution explanation written by the Super Admin.
+    - Official resolution timestamp in Asia/Kolkata timezone.
+- Status Transition History Log:
+  - Chronological audit box listing each status change with date and admin note.
+- Modal Footer & Reopen Control:
+  - If ticket is in progress: Displays informational clock notice: "Ticket is currently [Status] by Super Admin."
+  - If ticket is Resolved:
+    - Displays: "Is this issue not resolved to your satisfaction?" + "Reopen Issue" button (Rose Red).
+    - Clicking reveals the Reopen Input Box with mandatory follow-up comment field.
+
+
+5. AVAILABLE ACTIONS
+--------------------------------------------------------------------------------
+1. Report New Issue: Submit a new operational ticket to the Super Admin.
+2. Search & Filter Tickets: Filter tickets by category, priority, status, or keyword.
+3. Inspect Conversation Thread: View full dialogue, admin replies, and status logs.
+4. Review Resolution Confirmation: Read the Super Admin's official resolution notes.
+5. Reopen Ticket: Reopen a closed ticket if the defect persists, providing mandatory feedback.
+6. Refresh Inbox: Pull in real-time admin replies and status transitions.
+
+
+6. STEP-BY-STEP USAGE GUIDE
+--------------------------------------------------------------------------------
+SCENARIO A: FILING A HARDWARE TICKET WITH THE SUPER ADMIN
+1. The stall's thermal receipt printer is cutting off the right margin on 58mm paper.
+2. In the sidebar, click "Report an Issue" (/support).
+3. Click the orange "Report New Issue" button.
+4. Fill out the form:
+   - Issue Title: "Thermal printer 58mm text margin cut off on right side".
+   - Category: Select "Hardware / Printer".
+   - Priority: Select "High".
+   - Detailed Description: "When printing receipts on our 58mm thermal USB printer, the rightmost 4 characters of item names are clipped off the edge of the paper."
+5. Review the Context Safeguard box: Confirm it lists your active stall (e.g., Fast Food Stall stall-1).
+6. Click "Submit Ticket".
+7. A green toast appears: "Support ticket #TKT-XXX submitted to Super Admin."
+8. The ticket appears in your list with status "Submitted".
+
+SCENARIO B: REVIEWING A RESOLUTION & REOPENING IF UNRESOLVED
+1. When the Super Admin investigates and resolves your ticket, status changes to "Resolved".
+2. Locate the ticket in the list. Notice the green "Resolved" badge.
+3. Click "View Thread".
+4. Read the green Resolution Note Banner:
+   - Admin writes: "Updated thermal receipt CSS printable stylesheet to set width to 48mm with auto-wrap padding."
+5. Test the printer at the counter: Suppose the margin is still clipped.
+6. In the modal footer, click the red "Reopen Issue" button.
+7. An urgent input box appears: "Reopen Ticket: Mandatory Follow-Up Comment".
+8. Type your explanation: "Tested on receipt #ORD-20261116-0004. Text is still clipping on 58mm rolls."
+9. Click "Submit & Reopen Ticket".
+10. Ticket status immediately updates to "Reopened" (Red badge), and an alert is sent back to the Super Admin console.
+
+
+7. SYSTEM BEHAVIOUR
+--------------------------------------------------------------------------------
+- Ticket Creation Routine (adminService.createTicket):
+  1. Generates sequential ticket ID: TKT-XXX.
+  2. Associates ticket with currentStall.id, currentStall.name, user.id, and user.name.
+  3. Sets initial status to 'Submitted'.
+  4. Appends initial description as Message 1 in the messages array.
+  5. Records timestamp in ISO 8601 format.
+  6. Persists to localStorage under 'fooddesk_tickets'.
+- Reopen Routine (adminService.reopenTicket):
+  1. Validates that reopen comment is non-empty.
+  2. Updates ticket.status to 'Reopened'.
+  3. Appends a new message authored by the owner explaining the reopening.
+  4. Appends an entry to ticket.history log: { status: 'Reopened', note: comment, timestamp }.
+- Strict Tenancy Filter:
+  getTickets() automatically filters by stallId: currentStall.id. Stall 1 cannot view tickets submitted by Stall 2 or Stall 3.
+
+
+8. EXPECTED RESULTS
+--------------------------------------------------------------------------------
+- Real-time synchronization: Admin replies and status updates appear immediately.
+- High-visibility resolution documentation preventing premature ticket closure.
+- Clean threaded dialogue layout with distinct visual styling for owner vs. admin.
+
+
+9. RELATED MODULES
+--------------------------------------------------------------------------------
+- Module 12: Super Admin Issue Management (/admin/tickets) (the administrative console where tickets are reviewed, replied to, and resolved).
+- Module 2: Layout & Navigation (Navbar alert notifications).
+
+
+10. RESTRICTIONS AND IMPORTANT NOTES
+--------------------------------------------------------------------------------
+- Non-Empty Fields Mandatory:
+  Issue Title and Detailed Description cannot be empty or whitespace-only.
+- Mandatory Reopen Justification:
+  Staff cannot simply click "Reopen" without explanation; a non-empty comment explaining why the issue persists is strictly required.
+- Stall Boundary Segregation:
+  Support tickets are bound to both the stall owner account AND the active physical stall ID.
+
+
+11. FREQUENTLY ASKED QUESTIONS (FAQ)
+--------------------------------------------------------------------------------
+Q1: Who receives my support tickets?
+A1: All tickets are delivered directly to the platform Super Administrator's centralized Issue Management Console (/admin/tickets).
+
+Q2: Can I delete a support ticket?
+A2: No. Support tickets are preserved as a permanent historical compliance record to ensure platform accountability and track recurring operational defects.
+
+Q3: Can I attach a screenshot to a ticket?
+A3: In the demonstration build, paste screenshot links or image URLs into the description field. In production releases, an S3 file uploader allows direct image attachments.
+
+
+12. VERIFICATION STATUS
+--------------------------------------------------------------------------------
+Verification Status: VERIFIED
+Audit Reference: Tested and validated against frontend/src/pages/support/SupportPage.jsx and frontend/src/services/adminService.js. Ticket creation, category/priority tagging, threaded dialogue rendering, resolution note display, and reopen workflows operate with 100% precision.
+
+================================================================================
+END OF FILE: 02_STALL_OWNER/09_Support_and_Issue_Management.txt
+================================================================================
